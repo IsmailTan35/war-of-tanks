@@ -5,12 +5,9 @@ const Hull = () => {
   return (
     <>
       <mesh>
-        <mesh>
-          <meshStandardMaterial color={"red"} />
-          <boxGeometry args={[5, 1, 3]} />
-          <Edges color="black" />
-        </mesh>
-        <meshStandardMaterial color={"hotpink"} />
+        <meshStandardMaterial color={"red"} />
+        <boxGeometry args={[3, 1, 5]} />
+        <Edges color="black" />
       </mesh>
     </>
   );

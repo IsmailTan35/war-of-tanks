@@ -7,11 +7,12 @@ const Tracks = (props: any) => {
   useEffect(() => {
     if (!ref) return;
     ref.current.rotation.x = 1.55;
+    ref.current.rotation.z = 1.55;
   }, [ref]);
 
   return (
     <>
-      <mesh position={[0, -0.5, direction == "left" ? 1.5 : -1.5]} ref={ref}>
+      <mesh position={[direction == "left" ? 1.5 : -1.5, -0.5, 0]} ref={ref}>
         <mesh position={[-1.5, 0, 0]}>
           <Cylinder args={[0.5, 0.5, 0.5, 60]}>
             <Edges color="black" />
