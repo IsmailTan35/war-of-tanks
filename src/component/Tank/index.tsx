@@ -7,7 +7,8 @@ import { useBox, useRaycastVehicle } from "@react-three/cannon";
 import { useWheels } from "@/app/hooks/useWheel";
 import { useControls } from "@/app/hooks/useControls";
 import { WheelDebug } from "../WheelDebug";
-import Weaponry from "../Weaponry";
+import { useFrame } from "@react-three/fiber";
+import { Vector3 } from "three";
 
 const Tank = () => {
   const width = 3;
@@ -59,10 +60,19 @@ const Tank = () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [document.body]);
+  useFrame(({ camera }) => {
+    if (chassisApi) {
+      const position = new Vector3();
+      chassisBody.current.getWorldPosition(position);
+      // chassisBody.current.getWorldPosition(position);
+      // camera.getWorldPosition(position);
+      // console.log(chassisBody);
+    }
+  });
   return (
     <>
-      <group ref={vehicle} layers={1}>
-        <mesh ref={chassisBody}>
+      <group ref={vehicle} layers={1} name="tank">
+        <group ref={chassisBody} layers={1} name="tank-body">
           <boxGeometry args={chassisBodyArgs} />
           <meshBasicMaterial
             transparent={true}
@@ -74,7 +84,7 @@ const Tank = () => {
           <Hull />
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
-        </mesh>
+        </group>
         <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[2]} radius={wheelRadius} />
@@ -82,13 +92,6 @@ const Tank = () => {
         <WheelDebug wheelRef={wheels[4]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[5]} radius={wheelRadius} />
       </group>
-      <Weaponry
-        connonAmmo={10}
-        {...{
-          radyanX,
-          radyanY,
-        }}
-      />
     </>
   );
 };
