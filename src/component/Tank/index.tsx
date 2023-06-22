@@ -7,16 +7,18 @@ import { useBox, useRaycastVehicle } from "@react-three/cannon";
 import { useWheels } from "@/app/hooks/useWheel";
 import { useControls } from "@/app/hooks/useControls";
 import { WheelDebug } from "../WheelDebug";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
+import Weaponry from "../Weaponry";
 
 const Tank = () => {
+  const { camera } = useThree();
   const width = 3;
   const height = 1;
   const front = 2.5;
   const wheelRadius = 0.5;
-  const [radyanX, setRadyanX] = useState(180);
-  const [radyanY, setRadyanY] = useState(110);
+  const [degreY, setDegreX] = useState(180);
+  const [degreX, setDegreY] = useState(110);
   const chassisBodyArgs: any = [width, height, front * 2];
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
@@ -46,8 +48,8 @@ const Tank = () => {
   useControls(vehicleApi, chassisApi);
 
   const handleMouseMove = (event: any) => {
-    setRadyanX(prv => prv + event.movementX * 0.2);
-    setRadyanY(prv => {
+    setDegreX(prv => prv + event.movementX * 0.2);
+    setDegreY(prv => {
       const fixedData = prv - event.movementY * 2;
       const result = fixedData > 110 ? 110 : fixedData < 90 ? 90 : fixedData;
       return result;
@@ -60,15 +62,7 @@ const Tank = () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [document.body]);
-  useFrame(({ camera }) => {
-    if (chassisApi) {
-      const position = new Vector3();
-      chassisBody.current.getWorldPosition(position);
-      // chassisBody.current.getWorldPosition(position);
-      // camera.getWorldPosition(position);
-      // console.log(chassisBody);
-    }
-  });
+
   return (
     <>
       <group ref={vehicle} layers={1} name="tank">
@@ -85,6 +79,14 @@ const Tank = () => {
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
         </group>
+        <Weaponry
+          connonAmmo={1}
+          {...{
+            degreY,
+            degreX,
+          }}
+        />
+
         <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[2]} radius={wheelRadius} />

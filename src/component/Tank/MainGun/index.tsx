@@ -71,13 +71,6 @@ const MainGun = () => {
               <meshBasicMaterial color="hotpink" />
             </Cylinder>
           </mesh>
-          <Weaponry
-            connonAmmo={1}
-            {...{
-              degreY,
-              degreX,
-            }}
-          />
         </mesh>
       </mesh>
     </>
