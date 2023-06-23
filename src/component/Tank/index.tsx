@@ -65,27 +65,20 @@ const Tank = () => {
 
   return (
     <>
-      <group ref={vehicle} layers={1} name="tank">
-        <group ref={chassisBody} layers={1} name="tank-body">
+      <group ref={vehicle} name="tank">
+        <group ref={chassisBody} name="tank-body">
           <boxGeometry args={chassisBodyArgs} />
           <meshBasicMaterial
             transparent={true}
             opacity={0.25}
             color={"black"}
           />
-          <Camera tankRef={chassisBody} />
+          <Camera />
           <Turret />
           <Hull />
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
         </group>
-        <Weaponry
-          connonAmmo={1}
-          {...{
-            degreY,
-            degreX,
-          }}
-        />
 
         <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
         <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
@@ -102,7 +95,12 @@ const Camera = (props: any) => {
   const cameraRef = useRef<any>();
 
   return (
-    <PerspectiveCamera ref={cameraRef} position={[10, -10, 10]} makeDefault />
+    <PerspectiveCamera
+      ref={cameraRef}
+      position={[10, -10, 10]}
+      makeDefault
+      name="thirdPersonCamera"
+    />
   );
 };
 export default Tank;

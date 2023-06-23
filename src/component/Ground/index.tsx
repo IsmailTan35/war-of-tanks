@@ -12,7 +12,7 @@ const Ground = () => {
   );
   return (
     <>
-      <mesh position={[0, 0, 0]} ref={groundRef} receiveShadow>
+      <mesh position={[0, 0, 0]} ref={groundRef} receiveShadow name="ground">
         <Plane args={[500, 500]}>
           <meshStandardMaterial color="#00ff00" />
         </Plane>

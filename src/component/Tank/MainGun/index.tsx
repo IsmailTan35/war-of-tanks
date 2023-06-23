@@ -65,13 +65,20 @@ const MainGun = () => {
               <meshBasicMaterial color="hotpink" />
             </Cylinder>
           </mesh>
-          <mesh position={[0, -2, 0]} ref={meshRef}>
+          <mesh position={[0, -2, 0]} ref={meshRef} name="attempt">
             <Cylinder args={[0.15, 0.15, 0.5, 60]}>
               <Edges color="black" />
               <meshBasicMaterial color="hotpink" />
             </Cylinder>
           </mesh>
         </mesh>
+        <Weaponry
+          connonAmmo={1}
+          {...{
+            degreY,
+            degreX,
+          }}
+        />
       </mesh>
     </>
   );

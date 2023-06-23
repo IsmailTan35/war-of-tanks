@@ -1,18 +1,26 @@
 import React from "react";
 import { useBox } from "@react-three/cannon";
+import { useThree } from "@react-three/fiber";
 const Tree = (props: any) => {
+  const { scene } = useThree();
   const { position } = props;
-  const [treeRef]: any = useBox(() => ({
+  const [treeRef, treeApi]: any = useBox(() => ({
     args: [2.45, 6, 2.45],
     position,
     mass: 1,
+    onCollide: e => {
+      e.body.remove();
+      if (e.body.name === "ground") return;
+      setTimeout(() => {
+        scene.remove(treeRef.current);
+        treeApi.collisionResponse.set(false);
+      }, 500);
+    },
   }));
 
   return (
     <>
-      <mesh position={position} ref={treeRef}>
-        <boxGeometry args={[2.45, 6, 2.45]} />
-        <meshBasicMaterial transparent={true} opacity={0.25} color={"black"} />
+      <mesh position={position} ref={treeRef} name="tree">
         <group position={[0, -1, 0]}>
           <mesh position={[0, 3.5, 0]}>
             <coneGeometry args={[0.5, 1, 16]} />

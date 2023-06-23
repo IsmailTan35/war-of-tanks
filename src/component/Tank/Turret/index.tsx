@@ -26,9 +26,9 @@ const Turret = () => {
   }, [document.body]);
 
   useFrame(() => {
-    const camera = ref.current;
+    const turret = ref.current;
     var angle = MathUtils.degToRad(degreX);
-    camera.rotation.y = angle;
+    turret.rotation.y = angle;
   });
   return (
     <>
