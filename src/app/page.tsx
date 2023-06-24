@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PointerLockControls } from "@react-three/drei";
 import MyScene from "../component/MyScene";
+
 import { SocketContext, client } from "@/controller/Contex";
 export default function Home() {
   const contolRef = useRef<any>();
