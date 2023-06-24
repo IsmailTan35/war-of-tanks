@@ -2,6 +2,7 @@ import React from "react";
 import { io } from "socket.io-client";
 
 export const url: any = () => {
+  if (typeof window === "undefined") return "";
   const hostname: any = window.location.hostname;
   const parsed: any = window.location.hostname.split(".");
   const protocol: any = window.location.protocol;

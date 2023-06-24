@@ -52,7 +52,7 @@ const RemoteTank = (props: any) => {
       scene.remove(chassisBody.current);
     };
   }, []);
-  console.log(item.id);
+
   return (
     <>
       <group ref={vehicle} name={"remote-tank" + item.id}>

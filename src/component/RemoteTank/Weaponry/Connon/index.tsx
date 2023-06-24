@@ -5,7 +5,6 @@ import * as THREE from "three";
 import { Vector3 } from "three";
 const Connon = (props: any) => {
   const { id } = props;
-  console.log(id);
   const { args = [2], args2 = [0.3], position = [0, -4, 0] } = props;
   const disabledCollide = [
     "remote-tank-body" + id,
@@ -22,7 +21,7 @@ const Connon = (props: any) => {
     position,
     onCollideBegin: (e: any) => {
       if (disabledCollide.includes(e.body.name) || isCollided) return;
-      console.log(disabledCollide, e.body.name);
+
       setIsCollided(prv => {
         if (prv) return prv;
         scene.remove(e.target);
@@ -42,7 +41,6 @@ const Connon = (props: any) => {
     const turret = scene.getObjectByName("turret" + (id ? id : ""));
     const camera = scene.getObjectByName("attempt" + (id ? id : ""));
     if (!turret || !camera) return;
-    console.log(turret);
 
     const turretTarget = new Vector3();
     const cameraTarget = new Vector3();
