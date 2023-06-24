@@ -4,18 +4,12 @@ import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Vector3 } from "three";
 const Connon = (props: any) => {
-  const {
-    connonStep,
-    degreX,
-    degreY,
-    args = [2],
-    args2 = [0.3],
-    position = [0, -4, 0],
-    id,
-  } = props;
+  const { id } = props;
+  console.log(id);
+  const { args = [2], args2 = [0.3], position = [0, -4, 0] } = props;
   const disabledCollide = [
-    "tank-body",
-    "tank-turret",
+    "remote-tank-body" + id,
+    "remote-tank-turret" + id,
     "tank-gun",
     "tank-track",
     "ground",
@@ -28,6 +22,7 @@ const Connon = (props: any) => {
     position,
     onCollideBegin: (e: any) => {
       if (disabledCollide.includes(e.body.name) || isCollided) return;
+      console.log(disabledCollide, e.body.name);
       setIsCollided(prv => {
         if (prv) return prv;
         scene.remove(e.target);
@@ -44,10 +39,10 @@ const Connon = (props: any) => {
 
   useEffect(() => {
     if (!containerRef.current) return;
-
-    const turret = scene.getObjectByName("turret");
-    const camera = scene.getObjectByName("attempt");
+    const turret = scene.getObjectByName("turret" + (id ? id : ""));
+    const camera = scene.getObjectByName("attempt" + (id ? id : ""));
     if (!turret || !camera) return;
+    console.log(turret);
 
     const turretTarget = new Vector3();
     const cameraTarget = new Vector3();
@@ -89,7 +84,7 @@ const Connon = (props: any) => {
   }, [containerRef, scene]);
   return (
     <>
-      <mesh ref={containerRef} name="cannon">
+      <mesh ref={containerRef} name="remote-cannon">
         <sphereGeometry args={args2} />
         <meshBasicMaterial color={"black"} />
       </mesh>

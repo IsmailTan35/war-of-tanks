@@ -1,31 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import Hull from "./Hull";
 import Turret from "./Turret";
 import Tracks from "./Tracks";
 import { PerspectiveCamera } from "@react-three/drei";
 import { useBox, useRaycastVehicle } from "@react-three/cannon";
-import { useWheels } from "@/app/hooks/useWheel";
-import { useControls } from "@/app/hooks/useControls";
+import { useWheels } from "@/hooks/useWheel";
+import { useControls } from "@/hooks/useControls";
 import { WheelDebug } from "../WheelDebug";
-import { useFrame, useThree } from "@react-three/fiber";
-import { Vector3 } from "three";
-import Weaponry from "../Weaponry";
-
-const Tank = () => {
-  const { camera } = useThree();
+import { Quaternion, Vector3 } from "three";
+import { SocketContext } from "@/controller/Contex";
+const Tank = (props: any) => {
+  const { position } = props;
+  const socket: any = useContext(SocketContext);
   const width = 3;
   const height = 1;
   const front = 2.5;
   const wheelRadius = 0.5;
-  const [degreY, setDegreX] = useState(180);
-  const [degreX, setDegreY] = useState(110);
+
   const chassisBodyArgs: any = [width, height, front * 2];
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
       allowSleep: false,
       args: chassisBodyArgs,
       mass: 150,
-      position: [0, 1, 0],
+      position: position,
     }),
     useRef(null)
   );
@@ -46,22 +44,88 @@ const Tank = () => {
   );
 
   useControls(vehicleApi, chassisApi);
-
-  const handleMouseMove = (event: any) => {
-    setDegreX(prv => prv + event.movementX * 0.2);
-    setDegreY(prv => {
-      const fixedData = prv - event.movementY * 2;
-      const result = fixedData > 110 ? 110 : fixedData < 90 ? 90 : fixedData;
-      return result;
-    });
-  };
-
   useEffect(() => {
-    document.body.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
+    const threshold = 0.005; // Eşik değeri (birim cinsinden)
+    let intervalPositionID: any = null;
+    let intervalQuanternionID: any = null;
+
+    const handlePositionChange = (newPosition: any) => {
+      const target: any = new Vector3();
+      chassisBody.current.getWorldPosition(target);
+
+      const dx = newPosition[0] - target.x;
+      const dy = newPosition[1] - target.y;
+      const dz = newPosition[2] - target.z;
+
+      if (
+        Math.abs(dx) < threshold &&
+        Math.abs(dy) < threshold &&
+        Math.abs(dz) < threshold
+      ) {
+        return;
+      }
+      socket.emit("position", {
+        x: target.x,
+        y: target.y,
+        z: target.z,
+      });
     };
-  }, [document.body]);
+    const handleQuaternionChange = (newPosition: any) => {
+      const target: any = new Quaternion();
+      chassisBody.current.getWorldQuaternion(target);
+
+      const dx = newPosition[0] - target.x;
+      const dy = newPosition[1] - target.y;
+      const dz = newPosition[2] - target.z;
+      const dw = newPosition[3] - target.w;
+
+      if (
+        Math.abs(dx) < threshold &&
+        Math.abs(dy) < threshold &&
+        Math.abs(dz) < threshold &&
+        Math.abs(dw) < threshold
+      ) {
+        return;
+      }
+      socket.emit("quaternion", {
+        x: target.x,
+        y: target.y,
+        z: target.z,
+        w: target.w,
+      });
+    };
+    const unsubscribePosition =
+      chassisApi.position.subscribe(handlePositionChange);
+    const unsubscribeQuaternion = chassisApi.quaternion.subscribe(
+      handleQuaternionChange
+    );
+
+    intervalPositionID = setInterval(() => {
+      const target: any = new Vector3();
+      chassisBody.current.getWorldPosition(target);
+      socket.emit("position", {
+        x: target.x,
+        y: target.y,
+        z: target.z,
+      });
+    }, 1500);
+    intervalQuanternionID = setInterval(() => {
+      const target: any = new Quaternion();
+      chassisBody.current.getWorldQuaternion(target);
+      socket.emit("quaternion", {
+        x: target.x,
+        y: target.y,
+        z: target.z,
+        w: target.w,
+      });
+    }, 250);
+    return () => {
+      unsubscribePosition();
+      unsubscribeQuaternion();
+      clearInterval(intervalPositionID);
+      clearInterval(intervalQuanternionID);
+    };
+  }, [chassisApi]);
 
   return (
     <>
@@ -92,11 +156,8 @@ const Tank = () => {
 };
 
 const Camera = (props: any) => {
-  const cameraRef = useRef<any>();
-
   return (
     <PerspectiveCamera
-      ref={cameraRef}
       position={[10, -10, 10]}
       makeDefault
       name="thirdPersonCamera"

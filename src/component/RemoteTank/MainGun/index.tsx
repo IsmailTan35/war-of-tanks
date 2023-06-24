@@ -2,8 +2,9 @@ import { Cylinder, Edges } from "@react-three/drei";
 import React, { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
-import Weaponry from "@/component/Weaponry";
-const MainGun = () => {
+import Weaponry from "../Weaponry";
+const MainGun = (props: any) => {
+  const { id } = props;
   const meshRef = useRef<any>();
   const mainGunRef = useRef<any>();
   const connectionPointRef = useRef<any>();
@@ -30,23 +31,19 @@ const MainGun = () => {
   };
 
   useEffect(() => {
-    document.body.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
+    // document.body.addEventListener("mousemove", handleMouseMove);
+    // return () => {
+    //   document.removeEventListener("mousemove", handleMouseMove);
+    // };
   }, []);
 
   useFrame(state => {
-    if (!meshRef.current) return;
-    var target = new Vector3();
-    mainGunRef.current.getWorldPosition(target);
-    var cameraDistance = 20;
-    state.camera.position.set(0, 5, -cameraDistance);
-    var angle = MathUtils.degToRad(degreX);
-    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
-    state.camera.lookAt(target.x, target.y, target.z);
-    var angleY = MathUtils.degToRad(degreY);
-    meshRef.current.rotation.z = angleY;
+    // if (!meshRef.current) return;
+    // var target = new Vector3();
+    // mainGunRef.current.getWorldPosition(target);
+    // var angle = MathUtils.degToRad(degreX);
+    // var angleY = MathUtils.degToRad(degreY);
+    // meshRef.current.rotation.z = angleY;
   });
 
   return (
@@ -65,7 +62,7 @@ const MainGun = () => {
               <meshBasicMaterial color="hotpink" />
             </Cylinder>
           </mesh>
-          <mesh position={[0, -2, 0]} ref={meshRef} name="attempt">
+          <mesh position={[0, -2, 0]} ref={meshRef} name={"attempt" + id}>
             <Cylinder args={[0.15, 0.15, 0.5, 60]}>
               <Edges color="black" />
               <meshBasicMaterial color="hotpink" />
@@ -77,6 +74,7 @@ const MainGun = () => {
           {...{
             degreY,
             degreX,
+            id,
           }}
         />
       </mesh>

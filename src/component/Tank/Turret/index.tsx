@@ -1,16 +1,22 @@
 import { Cylinder, Edges } from "@react-three/drei";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import MainGun from "../MainGun";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils } from "three";
+import { SocketContext } from "@/controller/Contex";
 
 const Turret = () => {
+  const socket: any = useContext<any>(SocketContext);
   const ref = useRef<any>(null);
   const [degreX, setDegreX] = useState(90);
   const [degreY, setDegreY] = useState(180);
 
   const handleMouseMove = (event: any) => {
-    setDegreX(prv => prv + event.movementX * 0.2);
+    setDegreX(prv => {
+      const data = prv + event.movementX * 0.2;
+      socket.emit("turret-rotation", { x: data, y: degreY });
+      return data;
+    });
     setDegreY(prv => {
       const fixedData = prv - event.movementY * 2;
       const result = fixedData > 110 ? 110 : fixedData < 90 ? 90 : fixedData;
@@ -23,7 +29,7 @@ const Turret = () => {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [document.body]);
+  }, []);
 
   useFrame(() => {
     const turret = ref.current;

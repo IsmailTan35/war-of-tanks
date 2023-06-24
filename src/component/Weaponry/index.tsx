@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Connon from "./Connon";
+import { SocketContext } from "@/controller/Contex";
 const Weaponry = (props: any) => {
-  const { connonAmmo = 5, degreX, degreY } = props;
+  const { connonAmmo = 5, degreX, degreY, id } = props;
   const [ammo, setAmmo] = useState<number>(0);
+  const socket: any = useContext<any>(SocketContext);
   useEffect(() => {
     let intervalId: any;
     let timeoutId: any;
@@ -10,7 +12,6 @@ const Weaponry = (props: any) => {
     window.addEventListener("click", e => {
       if (e.button !== 0) return;
       if (timer) return;
-      // console.info(`stand by...(${timer} seconds.)`);
       setAmmo(prv => prv + 1);
       timer = 2.5;
       intervalId = setInterval((e: any) => {
@@ -19,8 +20,8 @@ const Weaponry = (props: any) => {
       }, 500);
       timeoutId = setTimeout(() => {
         clearInterval(intervalId);
-        // console.info("Döngü durdu.");
       }, 2500);
+      socket.emit("triggerFiring");
     });
     return () => {
       window.removeEventListener("click", () => {});
@@ -33,7 +34,7 @@ const Weaponry = (props: any) => {
   return (
     <>
       {Array.from({ length: ammo }, (_, index) => (
-        <Connon key={index} layer={index} {...{ degreX, degreY }} />
+        <Connon key={index} layer={index} {...{ degreX, degreY, id }} />
       ))}
     </>
   );
