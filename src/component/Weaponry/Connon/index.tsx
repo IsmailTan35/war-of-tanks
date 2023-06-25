@@ -1,9 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Vector3 } from "three";
+
 const Connon = (props: any) => {
+  const explosionAudio = new Audio("audio/explosion.mp3");
+  const audio2 = new Audio("audio/cannon-fire.mp3");
   const {
     connonStep,
     degreX,
@@ -20,12 +23,14 @@ const Connon = (props: any) => {
     "tank-track",
     "ground",
   ];
-  const { scene, gl } = useThree();
+  const { scene, gl }: any = useThree();
   const [isCollided, setIsCollided] = React.useState(false);
+
   const [containerRef, api]: any = useSphere(() => ({
     mass: 1,
     args,
     position,
+
     onCollideBegin: (e: any) => {
       if (disabledCollide.includes(e.body.name) || isCollided) return;
       setIsCollided(prv => {
@@ -37,6 +42,12 @@ const Connon = (props: any) => {
         const position = new Vector3();
         e.target.getWorldPosition(position);
         blowUp({ scene, position });
+        if (explosionAudio) {
+          explosionAudio.play();
+          setTimeout(() => {
+            explosionAudio.pause();
+          }, 1350);
+        }
         return !prv;
       });
     },
@@ -63,7 +74,12 @@ const Connon = (props: any) => {
       (cameraTarget.z - turretTarget.z) * force,
     ];
     const bodyPosition = [turretTarget.x, 0, turretTarget.z];
-
+    if (audio2) {
+      audio2.play();
+      setTimeout(() => {
+        audio2.pause();
+      }, 1450);
+    }
     api.applyLocalImpulse(impulse, bodyPosition);
     setTimeout(() => {
       api.collisionResponse.set(true);
@@ -79,6 +95,12 @@ const Connon = (props: any) => {
         const position = new Vector3();
         containerRef.current.getWorldPosition(position);
         blowUp({ scene, position });
+        if (explosionAudio) {
+          explosionAudio.play();
+          setTimeout(() => {
+            explosionAudio.pause();
+          }, 1350);
+        }
         return !prv;
       });
     }, 750);
