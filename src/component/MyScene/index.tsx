@@ -9,6 +9,7 @@ import { SocketContext } from "@/controller/Contex";
 import getRandomPosition from "@/utils/getRandomPosition";
 import { useThree } from "@react-three/fiber";
 import SmokeParticles from "../SmokeParticles";
+import BombardmentArea from "../BombardmentArea";
 
 const MyScene = () => {
   const { scene }: any = useThree();
@@ -75,6 +76,7 @@ const MyScene = () => {
         })}
         <Trees />
         <Rocks />
+        <BombardmentArea />
         <Suspense fallback={null}>
           <SmokeParticles />
         </Suspense>

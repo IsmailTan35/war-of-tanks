@@ -9,6 +9,7 @@ import FPSCounter from "@/component/FpsCounter";
 import SocketController from "@/controller/SocketController";
 import PingCounter from "@/component/PingCounter";
 import Name from "@/component/Name";
+import { Text } from "@react-three/drei";
 export default function Home() {
   const contolRef = useRef<any>();
 
@@ -39,7 +40,6 @@ export default function Home() {
             <PingCounter />
           </div>
           <Name />
-
           <Canvas>
             <MyScene />
             <PointerLockControls selector="#button" />

@@ -28,7 +28,7 @@ const Tank = (props: any) => {
       allowSleep: false,
       args: chassisBodyArgs,
       mass: 150,
-      position: position,
+      position,
     }),
     useRef(null)
   );

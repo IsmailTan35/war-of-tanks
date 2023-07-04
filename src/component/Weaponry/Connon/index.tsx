@@ -23,10 +23,10 @@ const Connon = (props: any) => {
     "tank-track",
     "ground",
   ];
-  const { scene, gl }: any = useThree();
+  const { scene }: any = useThree();
   const [isCollided, setIsCollided] = React.useState(false);
 
-  const [containerRef, api]: any = useSphere(() => ({
+  const [cannonRef, api]: any = useSphere(() => ({
     mass: 1,
     args,
     position,
@@ -56,12 +56,12 @@ const Connon = (props: any) => {
   }));
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!cannonRef.current) return;
 
     const turret = scene.getObjectByName("barrel");
     const attempt = scene.getObjectByName("vectorial-barrel");
-    if (!turret || !attempt) return;
 
+    if (!turret || !attempt) return;
     const turretTarget = new Vector3();
     const attemptTarget = new Vector3();
 
@@ -84,21 +84,19 @@ const Connon = (props: any) => {
       }, 1450);
     }
     api.applyLocalImpulse(impulse, bodyPosition2);
+    api.collisionResponse.set(true);
 
     setTimeout(() => {
-      api.collisionResponse.set(true);
-    }, 100);
+      scene.remove(cannonRef.current);
 
-    setTimeout(() => {
-      scene.remove(containerRef.current);
       setIsCollided(prv => {
         if (prv) return prv;
-        scene.remove(containerRef.current);
+        scene.remove(cannonRef.current);
         api.collisionResponse.set(false);
-        containerRef.current.visible = false;
+        cannonRef.current.visible = false;
         api.applyLocalImpulse([0, 0, 0], [0, 0, 0]);
         const position = new Vector3();
-        containerRef.current.getWorldPosition(position);
+        cannonRef.current.getWorldPosition(position);
         blowUp({ scene, position });
         if (explosionAudio) {
           explosionAudio.play();
@@ -109,19 +107,19 @@ const Connon = (props: any) => {
         return !prv;
       });
     }, 750);
-  }, [scene, containerRef, api]);
+  }, [scene, cannonRef, api]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    scene.add(containerRef.current);
+    if (!cannonRef.current) return;
+    scene.add(cannonRef.current);
     return () => {
-      scene.remove(containerRef.current);
+      scene.remove(cannonRef.current);
     };
-  }, [containerRef, scene]);
+  }, [cannonRef, scene]);
 
   return (
     <>
-      <mesh ref={containerRef} name="cannon">
+      <mesh ref={cannonRef} name="cannon">
         <sphereGeometry args={args2} />
         <meshBasicMaterial color={"black"} />
       </mesh>

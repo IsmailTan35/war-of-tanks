@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Connon from "./Connon";
 import { SocketContext } from "@/controller/Contex";
+import SmokeParticles from "../SmokeParticles";
 const Weaponry = (props: any) => {
   const explosionAudio = new Audio("audio/explosion.mp3");
   const audio2 = new Audio("audio/cannon-fire.mp3");
@@ -11,6 +12,7 @@ const Weaponry = (props: any) => {
     let intervalId: any;
     let timeoutId: any;
     let timer: any;
+
     window.addEventListener("click", e => {
       if (e.button !== 0) return;
       if (timer) return;
@@ -35,6 +37,7 @@ const Weaponry = (props: any) => {
 
   return (
     <>
+      <SmokeParticles isActive={ammo} />
       {Array.from({ length: ammo }, (_, index) => (
         <Connon
           key={index}

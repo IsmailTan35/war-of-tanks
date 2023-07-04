@@ -8,7 +8,6 @@ import Turret from "./Turret";
 import { useFrame, useThree } from "@react-three/fiber";
 import { WheelDebug } from "../WheelDebug";
 import { Text } from "@react-three/drei";
-import { Vector3 } from "three";
 const width = 3;
 const height = 1;
 const front = 1.5;
