@@ -5,8 +5,6 @@ import * as THREE from "three";
 import { Vector3 } from "three";
 
 const Connon = (props: any) => {
-  const explosionAudio = new Audio("audio/explosion.mp3");
-  const audio2 = new Audio("audio/cannon-fire.mp3");
   const {
     connonStep,
     degreX,
@@ -15,6 +13,8 @@ const Connon = (props: any) => {
     args2 = [0.3],
     position = [0, -4, 0],
     id,
+    explosionAudio,
+    audio2,
   } = props;
   const disabledCollide = [
     "tank-body",
@@ -32,7 +32,9 @@ const Connon = (props: any) => {
     position,
 
     onCollideBegin: (e: any) => {
-      if (disabledCollide.includes(e.body.name) || isCollided) return;
+      if (disabledCollide.includes(e.body.name) || isCollided) {
+        return;
+      }
       setIsCollided(prv => {
         if (prv) return prv;
         scene.remove(e.target);
@@ -56,34 +58,37 @@ const Connon = (props: any) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const turret = scene.getObjectByName("turret");
-    const camera = scene.getObjectByName("attempt");
-    if (!turret || !camera) return;
+    const turret = scene.getObjectByName("barrel");
+    const attempt = scene.getObjectByName("vectorial-barrel");
+    if (!turret || !attempt) return;
 
     const turretTarget = new Vector3();
-    const cameraTarget = new Vector3();
+    const attemptTarget = new Vector3();
 
     turret?.getWorldPosition(turretTarget);
-    camera?.getWorldPosition(cameraTarget);
+    attempt?.getWorldPosition(attemptTarget);
     api.position.set(turretTarget.x, 1, turretTarget.z);
 
-    const force = 200;
+    const force = 550;
     const impulse = [
-      (cameraTarget.x - turretTarget.x) * force,
-      0,
-      (cameraTarget.z - turretTarget.z) * force,
+      (attemptTarget.x - turretTarget.x) * force,
+      (attemptTarget.y - turretTarget.y) * force,
+      (attemptTarget.z - turretTarget.z) * force,
     ];
     const bodyPosition = [turretTarget.x, 0, turretTarget.z];
+    const bodyPosition2 = [0, 0, 0];
     if (audio2) {
       audio2.play();
       setTimeout(() => {
         audio2.pause();
       }, 1450);
     }
-    api.applyLocalImpulse(impulse, bodyPosition);
+    api.applyLocalImpulse(impulse, bodyPosition2);
+
     setTimeout(() => {
       api.collisionResponse.set(true);
     }, 100);
+
     setTimeout(() => {
       scene.remove(containerRef.current);
       setIsCollided(prv => {
@@ -107,8 +112,13 @@ const Connon = (props: any) => {
   }, [scene, containerRef, api]);
 
   useEffect(() => {
+    if (!containerRef.current) return;
     scene.add(containerRef.current);
+    return () => {
+      scene.remove(containerRef.current);
+    };
   }, [containerRef, scene]);
+
   return (
     <>
       <mesh ref={containerRef} name="cannon">
@@ -142,7 +152,6 @@ const blowUp = (props: any) => {
       scale = THREE.MathUtils.lerp(scale, targetScale, 0.1);
       meshSphere.scale.set(scale, scale, scale);
 
-      // Check if the target scale is reached
       if (scale >= targetScale - 0.01) {
         isScaling = false;
       }
@@ -150,7 +159,6 @@ const blowUp = (props: any) => {
       scale = THREE.MathUtils.lerp(scale, 0, 0.1);
       meshSphere.scale.set(scale, scale, scale);
 
-      // Check if the mesh is invisible
       if (scale <= 0.01) {
         clearInterval(intervalID);
       }

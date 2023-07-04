@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Connon from "./Connon";
 import { SocketContext } from "@/controller/Contex";
 const Weaponry = (props: any) => {
+  const explosionAudio = new Audio("audio/explosion.mp3");
+  const audio2 = new Audio("audio/cannon-fire.mp3");
   const { connonAmmo = 5, degreX, degreY, id } = props;
   const [ammo, setAmmo] = useState<number>(0);
   const socket: any = useContext<any>(SocketContext);
@@ -34,7 +36,11 @@ const Weaponry = (props: any) => {
   return (
     <>
       {Array.from({ length: ammo }, (_, index) => (
-        <Connon key={index} layer={index} {...{ degreX, degreY, id }} />
+        <Connon
+          key={index}
+          layer={index}
+          {...{ degreX, degreY, id, explosionAudio, audio2 }}
+        />
       ))}
     </>
   );

@@ -5,18 +5,20 @@ import React, { useEffect, useRef } from "react";
 import Tracks from "../Tank/Tracks";
 import Hull from "../Tank/Hull";
 import Turret from "./Turret";
-import { useThree } from "@react-three/fiber";
-
+import { useFrame, useThree } from "@react-three/fiber";
+import { WheelDebug } from "../WheelDebug";
+import { Text } from "@react-three/drei";
+import { Vector3 } from "three";
 const width = 3;
 const height = 1;
-const front = 2.5;
+const front = 1.5;
 const wheelRadius = 0.5;
 const chassisBodyArgs: any = [width, height, front * 2];
 
 const RemoteTank = (props: any) => {
   const { position, item } = props;
   const { scene } = useThree();
-
+  const nameRef = useRef<any>(null);
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
       allowSleep: false,
@@ -53,6 +55,12 @@ const RemoteTank = (props: any) => {
     };
   }, []);
 
+  useFrame(({ camera }) => {
+    const cameraPosition = camera.position;
+
+    const textRotation = Math.atan2(cameraPosition.x, cameraPosition.z);
+    nameRef.current.rotation.y = textRotation;
+  });
   return (
     <>
       <group ref={vehicle} name={"remote-tank" + item.id}>
@@ -67,7 +75,41 @@ const RemoteTank = (props: any) => {
           <Hull />
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
+          <group position={[0, 3, -0.1]} ref={nameRef}>
+            <mesh>
+              <boxGeometry args={[3, 1, 0.2]} />
+              <meshBasicMaterial color="red" />
+            </mesh>
+            <Text
+              fontSize={0.5}
+              letterSpacing={-0.1}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+              position={[0, 0, 0.2]}
+            >
+              {item.name}
+            </Text>
+            <Text
+              fontSize={0.5}
+              letterSpacing={-0.1}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+              position={[0, 0, -0.2]}
+              rotation={[0, Math.PI, 0]}
+            >
+              {item.name}
+            </Text>
+          </group>
         </group>
+
+        <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
+        <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
+        <WheelDebug wheelRef={wheels[2]} radius={wheelRadius} />
+        <WheelDebug wheelRef={wheels[3]} radius={wheelRadius} />
+        <WheelDebug wheelRef={wheels[4]} radius={wheelRadius} />
+        <WheelDebug wheelRef={wheels[5]} radius={wheelRadius} />
       </group>
     </>
   );

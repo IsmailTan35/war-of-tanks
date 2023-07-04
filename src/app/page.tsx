@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PointerLockControls } from "@react-three/drei";
 import MyScene from "../component/MyScene";
@@ -8,9 +8,9 @@ import { SocketContext, client } from "@/controller/Contex";
 import FPSCounter from "@/component/FpsCounter";
 import SocketController from "@/controller/SocketController";
 import PingCounter from "@/component/PingCounter";
+import Name from "@/component/Name";
 export default function Home() {
   const contolRef = useRef<any>();
-  const audioRef = useRef<any>();
 
   return (
     <>
@@ -38,10 +38,11 @@ export default function Home() {
             <FPSCounter />
             <PingCounter />
           </div>
+          <Name />
 
           <Canvas>
             <MyScene />
-            <PointerLockControls ref={contolRef} />
+            <PointerLockControls selector="#button" />
             <OrbitControls ref={contolRef} />
           </Canvas>
         </div>

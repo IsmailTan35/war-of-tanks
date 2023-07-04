@@ -21,10 +21,10 @@ const MainGun = () => {
   const [degreX, setDegreX] = useState(180);
   const [degreY, setDegreY] = useState(110);
   const handleMouseMove = (event: any) => {
-    setDegreX(prv => prv + event.movementX * 0.2);
+    setDegreX(prv => prv - event.movementX * 0.2);
     setDegreY(prv => {
       const fixedData = prv - event.movementY * 2;
-      const result = fixedData > 110 ? 110 : fixedData < 90 ? 90 : fixedData;
+      const result = fixedData > 120 ? 120 : fixedData < 80 ? 80 : fixedData;
       return result;
     });
   };
@@ -55,22 +55,27 @@ const MainGun = () => {
         <mesh ref={connectionPointRef} position={[-0.8, 0, 0]}>
           <Cylinder args={[0.3, 0.3, 0.5, 60]}>
             <Edges color="black" />
-            <meshBasicMaterial color="hotpink" />
+            <meshStandardMaterial color={0x637f0e} />
           </Cylinder>
         </mesh>
         <mesh ref={meshRef}>
           <mesh>
-            <Cylinder args={[0.1, 0.1, 4, 60]}>
+            <Cylinder args={[0.1, 0.1, 4.5, 60]}>
               <Edges color="black" />
-              <meshBasicMaterial color="hotpink" />
+              <meshStandardMaterial color={0x637f0e} />
             </Cylinder>
           </mesh>
-          <mesh position={[0, -2, 0]} ref={meshRef} name="attempt">
+          <mesh position={[0, -2, 0]} ref={meshRef} name="barrel">
             <Cylinder args={[0.15, 0.15, 0.5, 60]}>
               <Edges color="black" />
-              <meshBasicMaterial color="hotpink" />
+              <meshStandardMaterial color={0x3e3f44} />
             </Cylinder>
           </mesh>
+          <mesh
+            position={[0, -5, 0]}
+            ref={meshRef}
+            name={"vectorial-barrel"}
+          ></mesh>
         </mesh>
         <Weaponry
           connonAmmo={1}

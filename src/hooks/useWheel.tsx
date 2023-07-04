@@ -30,27 +30,27 @@ export const useWheels = (width: any, height: any, front: any, radius: any) => {
   const wheelInfos = [
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [-width * 0.65, -height * 0.4, front],
+      chassisConnectionPointLocal: [-width * 0.5, -height * 0.4, front],
     },
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [width * 0.65, -height * 0.4, front],
+      chassisConnectionPointLocal: [width * 0.5, -height * 0.4, front],
     },
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [width * 0.65, -height * 0.4, 0],
+      chassisConnectionPointLocal: [width * 0.5, -height * 0.4, 0],
     },
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [-width * 0.65, -height * 0.4, 0],
+      chassisConnectionPointLocal: [-width * 0.5, -height * 0.4, 0],
     },
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [-width * 0.65, -height * 0.4, -front],
+      chassisConnectionPointLocal: [-width * 0.5, -height * 0.4, -front],
     },
     {
       ...wheelInfo,
-      chassisConnectionPointLocal: [width * 0.65, -height * 0.4, -front],
+      chassisConnectionPointLocal: [width * 0.5, -height * 0.4, -front],
     },
   ];
 
