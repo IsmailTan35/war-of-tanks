@@ -10,10 +10,13 @@ import getRandomPosition from "@/utils/getRandomPosition";
 import { useThree } from "@react-three/fiber";
 import SmokeParticles from "../SmokeParticles";
 import BombardmentArea from "../BombardmentArea";
+import CustomHud from "../CustomHud";
+import { tanksPositionActions, useAppDispatch } from "@/store";
 
 const MyScene = () => {
   const { scene }: any = useThree();
   const socket: any = useContext(SocketContext);
+  const dispatch = useAppDispatch();
   const [user, setUser] = useState<any>([]);
   const [position, setPosition] = useState<any>(
     getRandomPosition(undefined, undefined, 1)
@@ -27,6 +30,7 @@ const MyScene = () => {
     });
 
     socket.on("left-user", (data: any) => {
+      dispatch(tanksPositionActions.deleteRemotePosition(data.id));
       setUser((prev: any) => {
         return prev.filter((item: any) => item.id !== data.id);
       });
@@ -58,6 +62,7 @@ const MyScene = () => {
       socket.off("users");
     };
   }, [socket]);
+
   useEffect(() => {
     const customPosition = getRandomPosition(undefined, undefined, 1);
     setPosition(customPosition);
@@ -66,6 +71,7 @@ const MyScene = () => {
   return (
     <>
       <Physics broadphase="SAP" gravity={[0, -10, 0]}>
+        <CustomHud />
         <ambientLight intensity={0.3} />
         <directionalLight intensity={0.8} position={[5, 10, 5]} castShadow />
         <Ground />

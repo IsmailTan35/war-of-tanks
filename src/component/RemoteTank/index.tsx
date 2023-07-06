@@ -8,6 +8,8 @@ import Turret from "./Turret";
 import { useFrame, useThree } from "@react-three/fiber";
 import { WheelDebug } from "../WheelDebug";
 import { Text } from "@react-three/drei";
+import Hitbox from "../HitBox";
+
 const width = 3;
 const height = 1;
 const front = 1.5;
@@ -70,6 +72,7 @@ const RemoteTank = (props: any) => {
             opacity={0.25}
             color={"black"}
           />
+          <Hitbox name="remotePlayer" />
           <Turret id={item.id} />
           <Hull />
           <Tracks direction={"left"} />

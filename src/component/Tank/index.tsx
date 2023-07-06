@@ -11,10 +11,13 @@ import { Quaternion, Vector3 } from "three";
 import { SocketContext } from "@/controller/Contex";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { tanksPositionActions, useAppDispatch } from "@/store";
+import Hitbox from "../HitBox";
 
 const Tank = (props: any) => {
   const { position } = props;
   const socket: any = useContext(SocketContext);
+  const dispatch = useAppDispatch();
   const [name, setName] = useState<any>("");
   const nameRef = useRef<any>(null);
   const width = 3;
@@ -57,8 +60,11 @@ const Tank = (props: any) => {
 
     const handlePositionChange = (newPosition: any) => {
       const target: any = new Vector3();
-      chassisBody.current.getWorldPosition(target);
 
+      chassisBody.current.getWorldPosition(target);
+      dispatch(
+        tanksPositionActions.updatePosition([target.x, target.y, target.z])
+      );
       const dx = newPosition[0] - target.x;
       const dy = newPosition[1] - target.y;
       const dz = newPosition[2] - target.z;
@@ -158,6 +164,7 @@ const Tank = (props: any) => {
             opacity={0.25}
             color={"black"}
           />
+          <Hitbox name={"player"} />
           <Camera />
           <Turret />
           <Hull />

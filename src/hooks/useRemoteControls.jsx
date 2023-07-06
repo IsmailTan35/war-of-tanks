@@ -1,7 +1,9 @@
 import { SocketContext, client } from "@/controller/Contex";
+import { tanksPositionActions, useAppDispatch } from "@/store";
 import { useContext, useEffect, useState } from "react";
 
 export const useRemoteControls = (vehicleApi, chassisApi) => {
+  const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
   let [controls, setControls] = useState({});
   const speed = 550;
@@ -23,6 +25,12 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
     });
     socket.on("position", data => {
       if ("remote-tank-body" + data.id !== chassisApi.name) return;
+      dispatch(
+        tanksPositionActions.updateRemotePositions({
+          id: data.id,
+          position: [data.position.x, data.position.y, data.position.z],
+        })
+      );
       chassisApi.position.set(
         data.position.x,
         data.position.y,

@@ -9,44 +9,48 @@ import FPSCounter from "@/component/FpsCounter";
 import SocketController from "@/controller/SocketController";
 import PingCounter from "@/component/PingCounter";
 import Name from "@/component/Name";
-import { Text } from "@react-three/drei";
+import { Provider } from "react-redux";
+import { store } from "@/store";
+
 export default function Home() {
   const contolRef = useRef<any>();
 
   return (
     <>
-      <SocketContext.Provider value={client}>
-        <div
-          style={{
-            width: "100vw",
-            height: "100vh",
-          }}
-        >
-          <SocketController />
+      <Provider store={store}>
+        <SocketContext.Provider value={client}>
           <div
             style={{
-              position: "fixed",
-              top: 10,
-              left: 10,
-              zIndex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              width: 100,
-              color: "#00ee00",
+              width: "100vw",
+              height: "100vh",
             }}
           >
-            <FPSCounter />
-            <PingCounter />
+            <SocketController />
+            <div
+              style={{
+                position: "fixed",
+                top: 10,
+                left: 10,
+                zIndex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                width: 100,
+                color: "#00ee00",
+              }}
+            >
+              <FPSCounter />
+              <PingCounter />
+            </div>
+            <Name />
+            <Canvas>
+              <MyScene />
+              <PointerLockControls selector="#button" />
+              <OrbitControls ref={contolRef} />
+            </Canvas>
           </div>
-          <Name />
-          <Canvas>
-            <MyScene />
-            <PointerLockControls selector="#button" />
-            <OrbitControls ref={contolRef} />
-          </Canvas>
-        </div>
-      </SocketContext.Provider>
+        </SocketContext.Provider>
+      </Provider>
     </>
   );
 }

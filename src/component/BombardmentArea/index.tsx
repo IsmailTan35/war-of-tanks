@@ -1,28 +1,40 @@
-import { Cylinder, Ring } from "@react-three/drei";
+import { Circle, Cylinder, Ring, Tube } from "@react-three/drei";
 import React from "react";
-import { BackSide, DoubleSide, RingGeometry } from "three";
-
+import { BackSide, DoubleSide, RingGeometry, TubeGeometry } from "three";
+import * as THREE from "three";
 const BombardmentArea = () => {
-  const thickness = 3;
-  const scaledInnerRadius = -2 - thickness / 2;
-  const scaledOuterRadius = 2 + thickness / 2;
+  const radius = 16;
+  const tubeRadius = 0.2;
+  const radialSegments = 16;
+  const tubularSegments = 128;
+
+  const geometry = new THREE.TorusGeometry(
+    radius,
+    tubeRadius,
+    radialSegments,
+    tubularSegments
+  );
+  const material = new THREE.MeshStandardMaterial({
+    color: "red",
+    metalness: 0.5,
+    roughness: 0.5,
+    side: THREE.DoubleSide,
+    emissiveIntensity: 0.5,
+  });
+  const material2 = new THREE.MeshStandardMaterial({
+    color: "red",
+    metalness: 0.5,
+    roughness: 0.5,
+    side: THREE.DoubleSide,
+    emissiveIntensity: 0.5,
+    opacity: 0.2,
+    transparent: true,
+  });
   return (
     <>
-      <group position={[0, 1, 0]}>
-        <mesh position={[0, 0, 0]}>
-          <ringBufferGeometry
-            attach="geometry"
-            args={[20, 25, 64, 8, 0, Math.PI * 2]}
-          />
-          <meshBasicMaterial attach="material" color="black" side={2} />
-        </mesh>
-        <mesh>
-          <cylinderGeometry args={[0.5, 0.5, 0.1, 60]} />
-          <meshStandardMaterial color="red" />
-        </mesh>
-        {/* <Cylinder position={[0, 0, 0]} args={[0.3, 0.3, 0.5, 60]}>
-          <meshStandardMaterial color="black" />
-        </Cylinder> */}
+      <group position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh geometry={geometry} material={material} position={[0, 0, 0]} />
+        <Circle args={[16, 128]} position={[0, 0.5, 0]} material={material2} />
       </group>
     </>
   );

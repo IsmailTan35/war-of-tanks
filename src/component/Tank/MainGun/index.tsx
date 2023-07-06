@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
 import Weaponry from "@/component/Weaponry";
-import SmokeParticles from "@/component/SmokeParticles";
+
 const MainGun = () => {
   const meshRef = useRef<any>();
   const mainGunRef = useRef<any>();
