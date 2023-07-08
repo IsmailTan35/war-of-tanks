@@ -1,26 +1,32 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { memo, useContext, useEffect, useRef, useState } from "react";
 import { Cylinder, Edges } from "@react-three/drei";
 import MainGun from "../MainGun";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils } from "three";
 import { SocketContext } from "@/controller/Contex";
 
-const Turret = () => {
+const Turret = (props: any) => {
+  const { id } = props;
   const socket: any = useContext<any>(SocketContext);
   const ref = useRef<any>(null);
   const [degreX, setDegreX] = useState(90);
+  const [degreY, setDegreY] = useState(110);
 
   const handleMouseMove = (event: any) => {
     setDegreX(prv => {
-      const data = prv - event.movementX * 0.2;
-      const fixedData = prv - event.movementY * 2;
-      socket.emit("turret-rotation", { x: data, y: fixedData });
-      return data;
+      const dataX = prv - event.movementX * 0.2;
+      setDegreY(prv => {
+        const dataY = prv - event.movementY * 2;
+        const fixedDataY = dataY > 120 ? 120 : dataY < 80 ? 80 : dataY;
+        socket.emit("turret-rotation", { x: dataX, y: fixedDataY });
+        return fixedDataY;
+      });
+      return dataX;
     });
   };
 
   useEffect(() => {
-    document.body.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
@@ -31,6 +37,7 @@ const Turret = () => {
     var angle = MathUtils.degToRad(degreX);
     turret.rotation.y = angle;
   });
+
   return (
     <>
       <group position={[0, 1, 1]} ref={ref} name="turret">
@@ -40,10 +47,10 @@ const Turret = () => {
             <meshStandardMaterial color="darkgreen" />
           </Cylinder>
         </mesh>
-        <MainGun />
+        <MainGun {...{ id }} />
       </group>
     </>
   );
 };
 
-export default Turret;
+export default memo(Turret);

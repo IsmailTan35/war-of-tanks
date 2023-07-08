@@ -17,11 +17,13 @@ function Rock(props: any) {
   const args: any = [11.5, 5, 5];
   const [isCollided, setIsCollided] = useState(false);
   const [stoneRef, stoneApi]: any = useBox(() => ({
+    type: "Static",
     args,
     mass: 1500,
     position,
     onCollide: (e: any) => {
-      if (disabledCollide.includes(e.body.name) || isCollided) return;
+      if (!e.body?.name || disabledCollide.includes(e.body.name) || isCollided)
+        return;
       setIsCollided(prv => {
         if (prv) return prv;
         scene.remove(stoneRef.current);

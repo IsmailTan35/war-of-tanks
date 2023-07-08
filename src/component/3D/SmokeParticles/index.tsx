@@ -12,8 +12,8 @@ const SmokeParticles = (props: any) => {
       if (points.current && points.current.geometry instanceof SphereGeometry) {
         setRadius(prv => {
           const newGeometry = new SphereGeometry(prv, 60, 60);
-          points.current.geometry.dispose(); // Dispose the old geometry
-          points.current.geometry = newGeometry; // Assign the new geometry,
+          points.current.geometry.dispose();
+          points.current.geometry = newGeometry;
           if (!isBigger && prv > 0.5) {
             isBigger = true;
             return prv;

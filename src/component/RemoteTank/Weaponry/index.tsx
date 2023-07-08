@@ -1,27 +1,34 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import Connon from "./Connon";
 import { SocketContext } from "@/controller/Contex";
+import Connon2 from "@/component/Weaponry/Connon2";
+import SmokeParticles from "@/component/3D/SmokeParticles";
 
 const Weaponry = (props: any) => {
   const { id } = props;
-  const [ammo, setAmmo] = useState<number>(0);
   const socket: any = useContext<any>(SocketContext);
+  const [cannonGroup, setCannonGroup] = useState<any>([]);
+  const [isFire, setIsFire] = useState<any>(null);
 
   useEffect(() => {
     socket.on("remote-open-fire", (data: any) => {
       if (data.id !== id) return;
-      setAmmo(prv => prv + 1);
+      setCannonGroup((prev: any) => [...prev, Date.now()]);
+      setIsFire(Date.now());
     });
     return () => {
       socket.off("remote-open-fire");
+      setCannonGroup([]);
     };
   }, []);
 
   return (
     <>
-      {Array.from({ length: ammo }, (_, index) => (
-        <Connon key={index} layer={index} {...{ id }} />
-      ))}
+      <group>
+        <SmokeParticles isActive={isFire} />
+        {cannonGroup.map((item: any, index: number) => (
+          <Connon2 key={index} layer={index} {...{ id }} />
+        ))}
+      </group>
     </>
   );
 };

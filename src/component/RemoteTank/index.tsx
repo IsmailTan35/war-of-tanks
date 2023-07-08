@@ -1,31 +1,41 @@
 import { useRemoteControls } from "@/hooks/useRemoteControls";
 import { useWheels } from "@/hooks/useWheel";
 import { useBox, useRaycastVehicle } from "@react-three/cannon";
-import React, { useEffect, useRef } from "react";
-import Tracks from "../Tank/Tracks";
-import Hull from "../Tank/Hull";
+import React, { useEffect, useRef, useState } from "react";
+import Tracks from "../3D/Tracks";
+import Hull from "../3D/Hull";
 import Turret from "./Turret";
 import { useFrame, useThree } from "@react-three/fiber";
-import { WheelDebug } from "../WheelDebug";
-import { Text } from "@react-three/drei";
-import Hitbox from "../HitBox";
+import { WheelDebug } from "../3D/WheelDebug";
+import { PerspectiveCamera, Text } from "@react-three/drei";
+import HitBox from "../3D/HitBox";
+import { useAppSelector } from "@/store";
+import { MathUtils, Vector3 } from "three";
 
-const width = 3;
-const height = 1;
-const front = 1.5;
+const width = 3.5;
+const height = 3;
+const front = 2.5;
 const wheelRadius = 0.5;
 const chassisBodyArgs: any = [width, height, front * 2];
 
-const RemoteTank = (props: any) => {
-  const { position, item } = props;
+interface IRemoteTank {
+  position?: [number, number, number];
+  item: any;
+  idx: number;
+}
+const RemoteTank = (props: IRemoteTank) => {
+  const { position = [0, 2, 0], item, idx } = props;
+  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
+
   const { scene } = useThree();
   const nameRef = useRef<any>(null);
+
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
       allowSleep: false,
       args: chassisBodyArgs,
-      mass: 150,
-      position: position || [0, 1, 0],
+      mass: 1500,
+      position: position,
     }),
     useRef(null)
   );
@@ -46,7 +56,7 @@ const RemoteTank = (props: any) => {
   );
 
   useEffect(() => {
-    chassisApi.name = "remote-tank-body" + item.id;
+    chassisApi.name = "tank-hitbox-" + item.id;
   }, [item.id]);
   useRemoteControls(vehicleApi, chassisApi);
 
@@ -56,25 +66,56 @@ const RemoteTank = (props: any) => {
     };
   }, []);
 
-  useFrame(({ camera }) => {
-    const cameraPosition = camera.position;
+  const [degreX, setDegreX] = useState(180);
+  const [degreY, setDegreY] = useState(110);
 
+  const handleMouseMove = (event: any) => {
+    setDegreX(prv => prv - event.movementX * 0.2);
+    setDegreY(prv => {
+      const fixedData = prv - event.movementY * 2;
+      const result = fixedData > 120 ? 120 : fixedData < 80 ? 80 : fixedData;
+      return result;
+    });
+  };
+
+  useEffect(() => {
+    if (!selectedCameraID || selectedCameraID !== idx + 1) return;
+    document.body.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [selectedCameraID]);
+
+  useFrame(({ camera }) => {
+    //namebox rotation
+    const cameraPosition = camera.position;
     const textRotation = Math.atan2(cameraPosition.x, cameraPosition.z);
     nameRef.current.rotation.y = textRotation;
   });
+
+  useFrame(state => {
+    if (!selectedCameraID || selectedCameraID !== idx + 1) return;
+    if (!chassisBody.current) return;
+    var target = new Vector3();
+    chassisBody.current.getWorldPosition(target);
+    var angle = MathUtils.degToRad(degreX);
+    var angleY = MathUtils.degToRad(degreY);
+
+    if (selectedCameraID === 0) return;
+    var cameraDistance = 20;
+    state.camera.position.set(0, 5, -cameraDistance);
+    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
+    state.camera.lookAt(target.x, target.y, target.z);
+  });
   return (
     <>
-      <group ref={vehicle} name={"remote-tank" + item.id}>
-        <group ref={chassisBody} name={"remote-tank-body" + item.id}>
-          <boxGeometry args={chassisBodyArgs} />
-          <meshBasicMaterial
-            transparent={true}
-            opacity={0.25}
-            color={"black"}
-          />
-          <Hitbox name="remotePlayer" />
-          <Turret id={item.id} />
-          <Hull />
+      <group ref={vehicle} name={"tank" + item.id}>
+        <HitBox ref={chassisBody} name={item.id}>
+          <Camera idx={idx} />
+          <group position={[0, -0.5, 0]}>
+            <Turret id={item.id} />
+            <Hull />
+          </group>
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
           <group position={[0, 3, -0.1]} ref={nameRef}>
@@ -104,17 +145,23 @@ const RemoteTank = (props: any) => {
               {item.name}
             </Text>
           </group>
-        </group>
+        </HitBox>
 
-        <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[2]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[3]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[4]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[5]} radius={wheelRadius} />
+        {wheels.map((wheel: any, index: number) => (
+          <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />
+        ))}
       </group>
     </>
   );
 };
-
+const Camera = (props: any) => {
+  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
+  return (
+    <PerspectiveCamera
+      position={[10, -10, 10]}
+      makeDefault={selectedCameraID === props.idx + 1}
+      name="thirdPersonCamera"
+    />
+  );
+};
 export default RemoteTank;

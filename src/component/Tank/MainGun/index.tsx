@@ -3,8 +3,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
 import Weaponry from "@/component/Weaponry";
+import { useAppSelector } from "@/store";
 
-const MainGun = () => {
+const MainGun = (props: any) => {
+  const { id } = props;
+  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
+
   const meshRef = useRef<any>();
   const mainGunRef = useRef<any>();
   const connectionPointRef = useRef<any>();
@@ -41,13 +45,15 @@ const MainGun = () => {
     if (!meshRef.current) return;
     var target = new Vector3();
     mainGunRef.current.getWorldPosition(target);
-    var cameraDistance = 20;
-    state.camera.position.set(0, 5, -cameraDistance);
     var angle = MathUtils.degToRad(degreX);
-    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
-    state.camera.lookAt(target.x, target.y, target.z);
     var angleY = MathUtils.degToRad(degreY);
     meshRef.current.rotation.z = angleY;
+
+    if (selectedCameraID !== 0) return;
+    var cameraDistance = 20;
+    state.camera.position.set(0, 5, -cameraDistance);
+    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
+    state.camera.lookAt(target.x, target.y, target.z);
   });
 
   return (
@@ -66,22 +72,19 @@ const MainGun = () => {
               <meshStandardMaterial color={0x637f0e} />
             </Cylinder>
           </mesh>
-          <mesh position={[0, -2, 0]} ref={meshRef} name="barrel">
+          <mesh position={[0, -2, 0]} name={"barrel-" + id}>
             <Cylinder args={[0.15, 0.15, 0.5, 60]}>
               <Edges color="black" />
               <meshStandardMaterial color={0x3e3f44} />
             </Cylinder>
           </mesh>
-          <mesh
-            position={[0, -5, 0]}
-            ref={meshRef}
-            name={"vectorial-barrel"}
-          ></mesh>
+          <mesh position={[0, -5, 0]} name={"vectorial-barrel-" + id}></mesh>
           <Weaponry
             connonAmmo={1}
             {...{
               degreY,
               degreX,
+              id,
             }}
           />
         </mesh>

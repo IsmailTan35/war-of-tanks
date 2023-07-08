@@ -9,8 +9,7 @@ const Tree = (props: any) => {
     position,
     mass: 1,
     onCollide: e => {
-      e.body.remove();
-      if (e.body.name === "ground") return;
+      if (e.body?.name === "ground") return;
       setTimeout(() => {
         scene.remove(treeRef.current);
         treeApi.collisionResponse.set(false);

@@ -1,17 +1,16 @@
-import React, { Suspense, useContext, useEffect, useState } from "react";
-import Ground from "@/component/Ground";
-import Rocks from "@/component/Rocks";
+import React, { useContext, useEffect, useState } from "react";
+import Ground from "@/component/3D/Ground";
+import Rocks from "@/component/3D/Rocks";
 import Tank from "@/component/Tank";
-import Trees from "@/component/Trees";
+import Trees from "@/component/3D/Trees";
 import { Physics } from "@react-three/cannon";
 import RemoteTank from "@/component/RemoteTank";
 import { SocketContext } from "@/controller/Contex";
 import getRandomPosition from "@/utils/getRandomPosition";
-import { useThree } from "@react-three/fiber";
-import SmokeParticles from "../SmokeParticles";
-import BombardmentArea from "../BombardmentArea";
+import BombardmentArea from "../3D/BombardmentArea";
 import CustomHud from "../CustomHud";
-import { tanksPositionActions, useAppDispatch } from "@/store";
+import { cameraActions, tanksPositionActions, useAppDispatch } from "@/store";
+import { useThree } from "@react-three/fiber";
 
 const MyScene = () => {
   const { scene }: any = useThree();
@@ -19,13 +18,13 @@ const MyScene = () => {
   const dispatch = useAppDispatch();
   const [user, setUser] = useState<any>([]);
   const [position, setPosition] = useState<any>(
-    getRandomPosition(undefined, undefined, 1)
+    getRandomPosition(undefined, undefined, 2)
   );
   useEffect(() => {
     if (!socket) return;
     socket.on("joined-user", (data: any) => {
       setUser((prev: any) => {
-        return [...prev, { id: data.id, position: [0, 1, 0] }];
+        return [...prev, { id: data.id, position: [0, 2, 0] }];
       });
     });
 
@@ -39,9 +38,10 @@ const MyScene = () => {
     socket.on("users", (data: any) => {
       setUser((prev: any) => {
         return data.map((item: any) => {
-          return { id: item.id, position: [0, 1, 0], name: item.name };
+          return { id: item.id, position: [0, 2, 0], name: item.name };
         });
       });
+      dispatch(cameraActions.updateMaxCamera(data.length));
     });
 
     socket.on("remote-set-name", (data: any) => {
@@ -78,14 +78,11 @@ const MyScene = () => {
 
         <Tank position={position} />
         {user.map((item: any, idx: number) => {
-          return <RemoteTank key={idx} item={item} />;
+          return <RemoteTank key={idx} item={item} idx={idx} />;
         })}
         <Trees />
         <Rocks />
         <BombardmentArea />
-        <Suspense fallback={null}>
-          <SmokeParticles />
-        </Suspense>
       </Physics>
     </>
   );

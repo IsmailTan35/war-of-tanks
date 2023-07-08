@@ -6,7 +6,7 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
   const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
   let [controls, setControls] = useState({});
-  const speed = 550;
+  const speed = 1550;
   useEffect(() => {
     socket.on("controls-down", data => {
       if (data.name !== vehicleApi.name) return;
@@ -24,7 +24,7 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
       }));
     });
     socket.on("position", data => {
-      if ("remote-tank-body" + data.id !== chassisApi.name) return;
+      if ("tank-hitbox-" + data.id !== chassisApi.name) return;
       dispatch(
         tanksPositionActions.updateRemotePositions({
           id: data.id,
@@ -38,7 +38,7 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
       );
     });
     socket.on("quaternion", data => {
-      if ("remote-tank-body" + data.id !== chassisApi.name) return;
+      if ("tank-hitbox-" + data.id !== chassisApi.name) return;
       chassisApi.quaternion.set(
         data.position.x,
         data.position.y,
@@ -46,7 +46,11 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
         data.position.w
       );
     });
-
+    socket.on("remote-hand-break", data => {
+      if ("tank-hitbox-" + data.id !== chassisApi.name) return;
+      chassisApi.velocity.set(0, 0, 0);
+      chassisApi.angularVelocity.set(0, 0, 0);
+    });
     return () => {
       socket.off("controls-down");
       socket.off("controls-up");
@@ -119,7 +123,7 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
     }
 
     if (controls.r) {
-      chassisApi.position.set(-1.5, 0.5, 3);
+      chassisApi.position.set(-1.5, 2, 3);
       chassisApi.velocity.set(0, 0, 0);
       chassisApi.angularVelocity.set(0, 0, 0);
       chassisApi.rotation.set(0, 0, 0);

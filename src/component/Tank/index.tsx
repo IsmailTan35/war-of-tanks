@@ -1,37 +1,61 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import Hull from "./Hull";
+import Hull from "../3D/Hull";
 import Turret from "./Turret";
-import Tracks from "./Tracks";
+import Tracks from "../3D/Tracks";
 import { PerspectiveCamera } from "@react-three/drei";
 import { useBox, useRaycastVehicle } from "@react-three/cannon";
 import { useWheels } from "@/hooks/useWheel";
 import { useControls } from "@/hooks/useControls";
-import { WheelDebug } from "../WheelDebug";
+import { WheelDebug } from "../3D/WheelDebug";
 import { Quaternion, Vector3 } from "three";
 import { SocketContext } from "@/controller/Contex";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { tanksPositionActions, useAppDispatch } from "@/store";
-import Hitbox from "../HitBox";
+import { tanksPositionActions, useAppDispatch, useAppSelector } from "@/store";
+import Hitbox from "../3D/HitBox";
 
+const width = 3.5;
+const height = 3;
+const front = 2.5;
+const wheelRadius = 0.5;
+const hitboxBodyArgs: any = [width, height, front * 2];
+const disableCollideNames = ["ground", "tree", "rock"];
 const Tank = (props: any) => {
   const { position } = props;
+  const id = "player";
   const socket: any = useContext(SocketContext);
   const dispatch = useAppDispatch();
   const [name, setName] = useState<any>("");
   const nameRef = useRef<any>(null);
-  const width = 3;
-  const height = 1;
-  const front = 1.5;
-  const wheelRadius = 0.5;
 
-  const chassisBodyArgs: any = [width, height, front * 2];
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
-      allowSleep: false,
-      args: chassisBodyArgs,
-      mass: 150,
+      args: hitboxBodyArgs,
+      mass: 1500,
       position,
+      userData: {
+        healtyPoint: 1000,
+      },
+      onCollide: (e: any) => {
+        if (
+          e.body?.name?.replace("cannon-") ===
+            e.target?.name?.replace("tank-hitbox-") ||
+          disableCollideNames.includes(e.body?.name) ||
+          (e.body?.name.includes("tank-hitbox-") &&
+            e.target?.name.includes("tank-hitbox-"))
+        )
+          return;
+        console.log("hit", {
+          hitPoint: -100,
+        });
+        e.target.userData.healtyPoint -= 100;
+        if (e.target.userData?.healtyPoint <= 0) {
+          socket.emit("dead", {
+            killer: e.body.name.replace("cannon-", ""),
+          });
+        }
+        // socket.emit("hit");
+      },
     }),
     useRef(null)
   );
@@ -106,6 +130,7 @@ const Tank = (props: any) => {
         w: target.w,
       });
     };
+
     const unsubscribePosition =
       chassisApi.position.subscribe(handlePositionChange);
     const unsubscribeQuaternion = chassisApi.quaternion.subscribe(
@@ -120,7 +145,8 @@ const Tank = (props: any) => {
         y: target.y,
         z: target.z,
       });
-    }, 1500);
+    }, 250);
+
     intervalQuanternionID = setInterval(() => {
       const target: any = new Quaternion();
       chassisBody.current.getWorldQuaternion(target);
@@ -156,18 +182,19 @@ const Tank = (props: any) => {
 
   return (
     <>
-      <group ref={vehicle} name="tank">
-        <group ref={chassisBody} name="tank-body">
-          <boxGeometry args={chassisBodyArgs} />
+      <group ref={vehicle} name={"tank-" + id}>
+        <Hitbox name={id} ref={chassisBody}>
+          <boxGeometry args={hitboxBodyArgs} />
           <meshBasicMaterial
             transparent={true}
             opacity={0.25}
             color={"black"}
           />
-          <Hitbox name={"player"} />
           <Camera />
-          <Turret />
-          <Hull />
+          <group position={[0, -0.5, 0]}>
+            <Turret id={id} />
+            <Hull />
+          </group>
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
           <group position={[0, 3, -0.1]} ref={nameRef}>
@@ -190,24 +217,21 @@ const Tank = (props: any) => {
               {name}
             </Text>
           </group>
-        </group>
-
-        <WheelDebug wheelRef={wheels[0]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[1]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[2]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[3]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[4]} radius={wheelRadius} />
-        <WheelDebug wheelRef={wheels[5]} radius={wheelRadius} />
+        </Hitbox>
+        {wheels.map((wheel: any, index: number) => (
+          <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />
+        ))}
       </group>
     </>
   );
 };
 
 const Camera = (props: any) => {
+  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
   return (
     <PerspectiveCamera
       position={[10, -10, 10]}
-      makeDefault
+      makeDefault={selectedCameraID == 0}
       name="thirdPersonCamera"
     />
   );

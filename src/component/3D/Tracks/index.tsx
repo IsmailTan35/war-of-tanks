@@ -1,10 +1,8 @@
-import { Circle, Cylinder, Edges, Ring, Sphere } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { Edges, Sphere } from "@react-three/drei";
 import React, { useEffect } from "react";
 
 const Tracks = (props: any) => {
   const [show, setShow] = React.useState(true);
-  const { scene } = useThree();
   const { direction, radius = [0.6, 8] } = props;
   const ref = React.useRef<any>(null);
 
@@ -20,7 +18,7 @@ const Tracks = (props: any) => {
   return (
     <>
       {show && (
-        <mesh position={[direction == "left" ? 1.5 : -1.5, -0.5, 0]} ref={ref}>
+        <mesh position={[direction == "left" ? 2 : -2, -1.5, 0]} ref={ref}>
           <mesh position={[-1.5, 0, 0]}>
             <Sphere args={radius}>
               <meshStandardMaterial color={0x222222} />

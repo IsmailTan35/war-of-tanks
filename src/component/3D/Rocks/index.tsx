@@ -6,7 +6,7 @@ const Rocks = () => {
     const min = -250;
     const max = 250;
     const x = Math.random() * (max - min) + min;
-    const y = 4;
+    const y = 2.5;
     const z = Math.random() * (max - min) + min;
     return [x, y, z];
   };

@@ -9,26 +9,25 @@ const Turret = (props: any) => {
   const { id } = props;
   const ref = useRef<any>(null);
   const socket: any = useContext<Socket>(SocketContext);
+  const mainGunRef = useRef<any>();
+
   useEffect(() => {
     socket.on("remote-turret-rotation", (data: any) => {
       if (!ref.current || data.id !== id) return;
       const turret = ref.current;
       const angleX = MathUtils.degToRad(data.rotation.x);
-      const angleY = MathUtils.degToRad(data.rotation.y);
       turret.rotation.y = angleX;
-      mainGunRef.current.rotation.x = angleY;
     });
     return () => {
       socket.off("remote-turret-rotation");
     };
   }, [socket]);
-  const mainGunRef = useRef<any>();
 
   return (
     <>
-      <group position={[0, 1, 1]} name={"turret" + id} ref={ref}>
+      <group position={[0, 1, 1]} ref={ref} name={"turret" + id}>
         <mesh position={[0, 0, 0]}>
-          <Cylinder args={[1, 1, 0.9, 60]}>
+          <Cylinder args={[1, 1.3, 0.9, 60]}>
             <Edges color="white" />
             <meshStandardMaterial color="darkgreen" />
           </Cylinder>

@@ -1,14 +1,25 @@
-import { useEffect, useState } from "react";
+import { SocketContext } from "@/controller/Contex";
+import { cameraActions, useAppDispatch } from "@/store";
+import { useContext, useEffect, useState } from "react";
 
 export const useControls = (vehicleApi, chassisApi) => {
+  const dispatch = useAppDispatch();
+  const socket = useContext(SocketContext);
   let [controls, setControls] = useState({});
-  const speed = 550;
+  const speed = 1550;
   useEffect(() => {
     const keyDownPressHandler = e => {
+      if (e.key.toLowerCase() === "h") {
+        dispatch(cameraActions.update());
+        return;
+      }
       setControls(controls => ({ ...controls, [e.key.toLowerCase()]: true }));
     };
 
     const keyUpPressHandler = e => {
+      if (e.key.toLowerCase() === "h") {
+        return;
+      }
       setControls(controls => ({ ...controls, [e.key.toLowerCase()]: false }));
     };
 
@@ -77,6 +88,7 @@ export const useControls = (vehicleApi, chassisApi) => {
     } else if (controls.b) {
       chassisApi.velocity.set(0, 0, 0);
       chassisApi.angularVelocity.set(0, 0, 0);
+      socket.emit("hand-break");
     } else {
       for (let i = 0; i < 6; i++) {
         vehicleApi.setSteeringValue(0, i);
@@ -84,7 +96,7 @@ export const useControls = (vehicleApi, chassisApi) => {
     }
 
     if (controls.r) {
-      chassisApi.position.set(-1.5, 0.5, 3);
+      chassisApi.position.set(-1.5, 2, 3);
       chassisApi.velocity.set(0, 0, 0);
       chassisApi.angularVelocity.set(0, 0, 0);
       chassisApi.rotation.set(0, 0, 0);

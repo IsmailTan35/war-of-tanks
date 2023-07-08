@@ -1,10 +1,13 @@
 import { Cylinder, Edges } from "@react-three/drei";
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useRef } from "react";
 import Weaponry from "../Weaponry";
+import { SocketContext } from "@/controller/Contex";
+import { MathUtils } from "three";
+
 const MainGun = forwardRef((props: any, ref: any) => {
+  const socket = useContext<any>(SocketContext);
   const { id } = props;
   const meshRef = useRef<any>();
-  const connectionPointRef = useRef<any>();
 
   useEffect(() => {
     if (!meshRef) return;
@@ -12,44 +15,43 @@ const MainGun = forwardRef((props: any, ref: any) => {
   }, [meshRef]);
 
   useEffect(() => {
-    if (!connectionPointRef) return;
-    connectionPointRef.current.rotation.x = 1.55;
-  }, [connectionPointRef]);
+    socket.on("remote-turret-rotation", (data: any) => {
+      if (!ref.current || data.id !== id) return;
+      const angleY = MathUtils.degToRad(data.rotation.y);
+      meshRef.current.rotation.z = angleY;
+    });
+    return () => {
+      socket.off("remote-turret-rotation");
+    };
+  }, [socket]);
 
   return (
     <>
       <mesh position={[1.6, 0, 0]} ref={ref}>
-        <mesh ref={connectionPointRef} position={[-0.8, 0, 0]}>
-          <Cylinder args={[0.3, 0.3, 0.5, 60]}>
-            <Edges color="black" />
-            <meshStandardMaterial color="hotpink" />
-          </Cylinder>
-        </mesh>
         <mesh ref={meshRef}>
           <mesh>
-            <Cylinder args={[0.1, 0.1, 4, 60]}>
+            <Cylinder args={[0.1, 0.1, 4.5, 60]}>
               <Edges color="black" />
-              <meshStandardMaterial color="hotpink" />
+              <meshStandardMaterial color={0x637f0e} />
             </Cylinder>
           </mesh>
-          <mesh position={[0, -2, 0]} ref={meshRef} name={"barrel" + id}>
+          <mesh position={[0, -2, 0]} name={"barrel-" + id}>
             <Cylinder args={[0.15, 0.15, 0.5, 60]}>
               <Edges color="black" />
-              <meshStandardMaterial color="hotpink" />
+              <meshStandardMaterial color={0x3e3f44} />
             </Cylinder>
           </mesh>
-          <mesh
-            position={[0, -5, 0]}
-            ref={meshRef}
-            name={"vectorial-barrel" + id}
-          ></mesh>
+          <mesh position={[0, -5, 0]} name={"vectorial-barrel-" + id}>
+            <boxGeometry args={[0.1, 0.1, 0.5]} />
+            <meshStandardMaterial color={0x3e3f44} />
+          </mesh>
+          <Weaponry
+            connonAmmo={1}
+            {...{
+              id,
+            }}
+          />
         </mesh>
-        <Weaponry
-          connonAmmo={1}
-          {...{
-            id,
-          }}
-        />
       </mesh>
     </>
   );
