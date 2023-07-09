@@ -1,9 +1,10 @@
 import { Cylinder, Edges } from "@react-three/drei";
 import React, { useContext, useEffect, useRef } from "react";
-import MainGun from "../MainGun";
+import MainGun from "../../3D/MainGun";
 import { SocketContext } from "@/controller/Contex";
 import { Socket } from "socket.io-client";
 import { MathUtils } from "three";
+import Weaponry from "../Weaponry";
 
 const Turret = (props: any) => {
   const { id } = props;
@@ -18,7 +19,13 @@ const Turret = (props: any) => {
       const angleX = MathUtils.degToRad(data.rotation.x);
       turret.rotation.y = angleX;
     });
+    socket.on("remote-turret-rotation", (data: any) => {
+      if (data.id !== id) return;
+      const angleY = MathUtils.degToRad(data.rotation.y);
+      mainGunRef.current.rotation.z = angleY;
+    });
     return () => {
+      socket.off("remote-turret-rotation");
       socket.off("remote-turret-rotation");
     };
   }, [socket]);
@@ -32,7 +39,13 @@ const Turret = (props: any) => {
             <meshStandardMaterial color="darkgreen" />
           </Cylinder>
         </mesh>
-        <MainGun {...{ id }} ref={mainGunRef} />
+        <MainGun {...{ id }} ref={mainGunRef}>
+          <Weaponry
+            {...{
+              id,
+            }}
+          />
+        </MainGun>
       </group>
     </>
   );

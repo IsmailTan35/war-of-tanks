@@ -1,25 +1,26 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "@/controller/Contex";
-import SmokeParticles from "../3D/SmokeParticles";
-import Connon2 from "./Connon2";
+import SmokeParticles from "../../3D/SmokeParticles";
+import { useAppSelector } from "@/store";
+import Connon2 from "../../3D/Connon2";
 
 const Weaponry = (props: any) => {
+  const { id } = props;
+  const socket: any = useContext<any>(SocketContext);
   const explosionAudio = new Audio("audio/explosion.mp3");
   const audio2 = new Audio("audio/cannon-fire.mp3");
-  const { degreX, degreY, id } = props;
-  const cannonGroup = useRef<any>([]);
+
+  const { spectatorMode } = useAppSelector(state => state.camera);
+
   const [isFire, setIsFire] = useState<any>(null);
-  const socket: any = useContext<any>(SocketContext);
+
+  const cannonGroup = useRef<any>([]);
 
   useEffect(() => {
-    let intervalId: any;
-    let timeoutId: any;
-    let timer: any;
-
-    document.addEventListener("click", e => {
+    function handleClicked(e: any) {
       if (e.button !== 0 || timer) return;
       setIsFire(Date.now);
-      timer = 1.5;
+      timer = 2.5;
       intervalId = setInterval((e: any) => {
         timer = timer - 0.5;
         if (!timer || timer <= 0) timer = null;
@@ -35,16 +36,26 @@ const Weaponry = (props: any) => {
           audio2.pause();
         }, 1450);
       }
-    });
+    }
+    if (spectatorMode) {
+      document.removeEventListener("click", handleClicked);
+      return;
+    }
+    let intervalId: any;
+    let timeoutId: any;
+    let timer: any;
+
+    document.addEventListener("click", handleClicked);
     return () => {
-      window.removeEventListener("click", () => {});
+      document.removeEventListener("click", handleClicked);
       clearInterval(intervalId);
       clearTimeout(timeoutId);
       setIsFire(null);
       timer = null;
       cannonGroup.current = [];
     };
-  }, []);
+  }, [spectatorMode]);
+
   return (
     <>
       <group>
@@ -55,8 +66,6 @@ const Weaponry = (props: any) => {
               key={index}
               idx={index}
               {...{
-                degreX,
-                degreY,
                 id,
                 explosionAudio,
                 cannonGroup,

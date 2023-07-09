@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "@/controller/Contex";
-import Connon2 from "@/component/Weaponry/Connon2";
 import SmokeParticles from "@/component/3D/SmokeParticles";
+import Connon2 from "@/component/3D/Connon2";
 
 const Weaponry = (props: any) => {
   const { id } = props;

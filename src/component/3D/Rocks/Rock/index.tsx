@@ -1,7 +1,11 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { memo, use, useEffect, useRef, useState } from "react";
 import { useBox } from "@react-three/cannon";
 import { Sphere } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
+import {
+  getRandomPosition,
+  getSeedRandomPosition,
+} from "@/utils/getRandomPosition";
 
 const disabledCollide = [
   "tank-body",
@@ -12,7 +16,7 @@ const disabledCollide = [
   "cannon",
 ];
 function Rock(props: any) {
-  const { position } = props;
+  const { position, setSeed } = props;
   const { scene } = useThree();
   const args: any = [11.5, 5, 5];
   const [isCollided, setIsCollided] = useState(false);
@@ -20,7 +24,8 @@ function Rock(props: any) {
     type: "Static",
     args,
     mass: 1500,
-    position,
+    collisionResponse: false,
+    position: [...getRandomPosition(undefined, undefined, 2.5)],
     onCollide: (e: any) => {
       if (!e.body?.name || disabledCollide.includes(e.body.name) || isCollided)
         return;
@@ -38,6 +43,18 @@ function Rock(props: any) {
       setIsCollided(true);
     }, 2500);
   }, [stoneRef]);
+
+  useEffect(() => {
+    if (!setSeed) return;
+    setSeed((prev: any) => {
+      const pst = getSeedRandomPosition(prev, undefined, undefined, 2.5);
+      stoneApi.position.set(pst[0], pst[1], pst[2]);
+      stoneApi.collisionResponse.set(true);
+
+      return prev + 3;
+    });
+  }, [setSeed]);
+
   return (
     <>
       <mesh
@@ -68,4 +85,4 @@ function Rock(props: any) {
   );
 }
 
-export default Rock;
+export default memo(Rock);

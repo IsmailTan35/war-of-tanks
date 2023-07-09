@@ -15,15 +15,19 @@ const Hitbox = forwardRef((props: IHitbox, ref: any) => {
         name={"tank-hitbox-" + name}
         ref={ref}
         userData={{
-          healty: 1500,
+          healtyPoint: 200,
         }}
       >
-        <boxGeometry args={hitArgs} />
-        <meshStandardMaterial
-          color={0x000000}
-          transparent={true}
-          opacity={0.2}
-        />
+        {false && (
+          <>
+            <boxGeometry args={hitArgs} />
+            <meshStandardMaterial
+              color={0x000000}
+              transparent={true}
+              opacity={0.2}
+            />
+          </>
+        )}
         {props.children}
       </mesh>
     </>

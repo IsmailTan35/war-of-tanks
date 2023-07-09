@@ -1,7 +1,7 @@
 import { useRemoteControls } from "@/hooks/useRemoteControls";
 import { useWheels } from "@/hooks/useWheel";
 import { useBox, useRaycastVehicle } from "@react-three/cannon";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Tracks from "../3D/Tracks";
 import Hull from "../3D/Hull";
 import Turret from "./Turret";
@@ -11,6 +11,8 @@ import { PerspectiveCamera, Text } from "@react-three/drei";
 import HitBox from "../3D/HitBox";
 import { useAppSelector } from "@/store";
 import { MathUtils, Vector3 } from "three";
+import { SocketContext } from "@/controller/Contex";
+import Destroy from "../3D/Destory";
 
 const width = 3.5;
 const height = 3;
@@ -24,9 +26,11 @@ interface IRemoteTank {
   idx: number;
 }
 const RemoteTank = (props: IRemoteTank) => {
+  const [isDestroyed, setIsDestroyed] = useState<boolean>(false);
+  const socket: any = useContext(SocketContext);
   const { position = [0, 2, 0], item, idx } = props;
   const selectedCameraID = useAppSelector(state => state.camera.selectedID);
-
+  const { spectatorMode } = useAppSelector(state => state.camera);
   const { scene } = useThree();
   const nameRef = useRef<any>(null);
 
@@ -79,12 +83,13 @@ const RemoteTank = (props: IRemoteTank) => {
   };
 
   useEffect(() => {
+    if (spectatorMode) return;
     if (!selectedCameraID || selectedCameraID !== idx + 1) return;
     document.body.addEventListener("mousemove", handleMouseMove);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [selectedCameraID]);
+  }, [selectedCameraID, spectatorMode]);
 
   useFrame(({ camera }) => {
     //namebox rotation
@@ -107,6 +112,18 @@ const RemoteTank = (props: IRemoteTank) => {
     state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
     state.camera.lookAt(target.x, target.y, target.z);
   });
+
+  useEffect(() => {
+    socket.on("remote-dead", (data: any) => {
+      if (data.victimId === item.id) {
+        setIsDestroyed(true);
+        chassisBody.current.userData.isDestroyed = true;
+      }
+    });
+    return () => {
+      socket.off("remote-dead");
+    };
+  }, []);
   return (
     <>
       <group ref={vehicle} name={"tank" + item.id}>
@@ -145,8 +162,8 @@ const RemoteTank = (props: IRemoteTank) => {
               {item.name}
             </Text>
           </group>
+          {isDestroyed && <Destroy />}
         </HitBox>
-
         {wheels.map((wheel: any, index: number) => (
           <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />
         ))}

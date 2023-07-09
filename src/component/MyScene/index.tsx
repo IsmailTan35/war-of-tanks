@@ -6,7 +6,7 @@ import Trees from "@/component/3D/Trees";
 import { Physics } from "@react-three/cannon";
 import RemoteTank from "@/component/RemoteTank";
 import { SocketContext } from "@/controller/Contex";
-import getRandomPosition from "@/utils/getRandomPosition";
+import { getRandomPosition } from "@/utils/getRandomPosition";
 import BombardmentArea from "../3D/BombardmentArea";
 import CustomHud from "../CustomHud";
 import { cameraActions, tanksPositionActions, useAppDispatch } from "@/store";
@@ -14,18 +14,21 @@ import { useThree } from "@react-three/fiber";
 
 const MyScene = () => {
   const { scene }: any = useThree();
-  const socket: any = useContext(SocketContext);
   const dispatch = useAppDispatch();
+  const socket: any = useContext(SocketContext);
+
   const [user, setUser] = useState<any>([]);
   const [position, setPosition] = useState<any>(
     getRandomPosition(undefined, undefined, 2)
   );
+  const [seed, setSeed] = useState<any>(null);
   useEffect(() => {
     if (!socket) return;
     socket.on("joined-user", (data: any) => {
       setUser((prev: any) => {
         return [...prev, { id: data.id, position: [0, 2, 0] }];
       });
+      dispatch(cameraActions.mutationCamera(+1));
     });
 
     socket.on("left-user", (data: any) => {
@@ -33,6 +36,7 @@ const MyScene = () => {
       setUser((prev: any) => {
         return prev.filter((item: any) => item.id !== data.id);
       });
+      dispatch(cameraActions.mutationCamera(-1));
     });
 
     socket.on("users", (data: any) => {
@@ -54,7 +58,12 @@ const MyScene = () => {
         });
       });
     });
+    socket.on("get-seed", (data: any) => {
+      setSeed(data);
+    });
+
     socket.emit("get-users");
+    socket.emit("send-seed");
 
     return () => {
       socket.off("joined-user");
@@ -80,8 +89,12 @@ const MyScene = () => {
         {user.map((item: any, idx: number) => {
           return <RemoteTank key={idx} item={item} idx={idx} />;
         })}
-        <Trees />
-        <Rocks />
+        {seed ? (
+          <>
+            <Rocks {...{ setSeed }} />
+            <Trees {...{ setSeed }} />
+          </>
+        ) : null}
         <BombardmentArea />
       </Physics>
     </>

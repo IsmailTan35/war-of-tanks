@@ -5,7 +5,7 @@ interface TanksPositionState {
   remotePlayers: { id: string; position: [number, number, number] }[];
 }
 const { reducer, actions } = createSlice({
-  name: "userActions",
+  name: "user",
   initialState: {
     player: null,
     remotePlayers: [],

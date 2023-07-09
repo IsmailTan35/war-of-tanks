@@ -11,8 +11,14 @@ import { Quaternion, Vector3 } from "three";
 import { SocketContext } from "@/controller/Contex";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { tanksPositionActions, useAppDispatch, useAppSelector } from "@/store";
+import {
+  cameraActions,
+  tanksPositionActions,
+  useAppDispatch,
+  useAppSelector,
+} from "@/store";
 import Hitbox from "../3D/HitBox";
+import Destroy from "../3D/Destory";
 
 const width = 3.5;
 const height = 3;
@@ -27,7 +33,8 @@ const Tank = (props: any) => {
   const dispatch = useAppDispatch();
   const [name, setName] = useState<any>("");
   const nameRef = useRef<any>(null);
-
+  const { spectatorMode } = useAppSelector(state => state.camera);
+  const [isDestroyed, setIsDestroyed] = useState<boolean>(false);
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
       args: hitboxBodyArgs,
@@ -37,24 +44,32 @@ const Tank = (props: any) => {
         healtyPoint: 1000,
       },
       onCollide: (e: any) => {
+        if (spectatorMode) return;
         if (
           e.body?.name?.replace("cannon-") ===
             e.target?.name?.replace("tank-hitbox-") ||
           disableCollideNames.includes(e.body?.name) ||
           (e.body?.name.includes("tank-hitbox-") &&
-            e.target?.name.includes("tank-hitbox-"))
+            e.target?.name.includes("tank-hitbox-")) ||
+          e.body?.name.replace("cannonBlowUp-") ===
+            e.target?.name.replace("tank-hitbox-")
         )
           return;
+        if (e.target.userData.healtyPoint <= 0) return;
         console.log("hit", {
           hitPoint: -100,
         });
         e.target.userData.healtyPoint -= 100;
         if (e.target.userData?.healtyPoint <= 0) {
+          setIsDestroyed(true);
           socket.emit("dead", {
-            killer: e.body.name.replace("cannon-", ""),
+            killerId: e.body.name.replace("cannon-", ""),
           });
+          dispatch(cameraActions.updateSpectatorMode(true));
+          setTimeout(() => {
+            dispatch(cameraActions.update(1));
+          }, 1000);
         }
-        // socket.emit("hit");
       },
     }),
     useRef(null)
@@ -78,6 +93,7 @@ const Tank = (props: any) => {
   useControls(vehicleApi, chassisApi);
 
   useEffect(() => {
+    if (spectatorMode) return;
     const threshold = 0.005;
     let intervalPositionID: any = null;
     let intervalQuanternionID: any = null;
@@ -163,7 +179,7 @@ const Tank = (props: any) => {
       clearInterval(intervalPositionID);
       clearInterval(intervalQuanternionID);
     };
-  }, [chassisApi]);
+  }, [chassisApi, spectatorMode]);
 
   useFrame(({ camera }) => {
     const cameraPosition = camera.position;
@@ -184,12 +200,6 @@ const Tank = (props: any) => {
     <>
       <group ref={vehicle} name={"tank-" + id}>
         <Hitbox name={id} ref={chassisBody}>
-          <boxGeometry args={hitboxBodyArgs} />
-          <meshBasicMaterial
-            transparent={true}
-            opacity={0.25}
-            color={"black"}
-          />
           <Camera />
           <group position={[0, -0.5, 0]}>
             <Turret id={id} />
@@ -217,6 +227,7 @@ const Tank = (props: any) => {
               {name}
             </Text>
           </group>
+          {isDestroyed && <Destroy />}
         </Hitbox>
         {wheels.map((wheel: any, index: number) => (
           <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />

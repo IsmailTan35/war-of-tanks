@@ -3,14 +3,28 @@ import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
+const disabledCollide = [
+  "ground",
+  "tank-body",
+  "tank-turret",
+  "tank-gun",
+  "tank-track",
+];
 const CannonBlowUp = (props: any) => {
-  const { position, setIsDestroyed } = props;
+  const { position, setIsDestroyed, id } = props;
   const { scene }: any = useThree();
-  const [cannonBlowUpRef, api]: any = useSphere(() => ({
+  const [cannonBlowUpRef, cannonBlowUpApi]: any = useSphere(() => ({
     position: [position.x, position.y, position.z],
+    args: [5],
     type: "Static",
-    args: [0.3],
-    onCollideBegin: (e: any) => {},
+    onCollideBegin: (e: any) => {
+      if (
+        disabledCollide.includes(e.body?.name) ||
+        e.target?.name.replace("cannonBlowUp-", "") ===
+          e.body?.name.replace("tank-hitbox-", "")
+      )
+        return;
+    },
     mass: 5,
     collisionResponse: false,
   }));
@@ -22,6 +36,7 @@ const CannonBlowUp = (props: any) => {
     let scale = 1;
     let isScaling = true;
     scene.add(cannonBlowUpRef.current);
+    cannonBlowUpApi.collisionResponse.set(true);
 
     const updateScale = () => {
       if (isScaling) {
@@ -34,15 +49,12 @@ const CannonBlowUp = (props: any) => {
       } else {
         scale = THREE.MathUtils.lerp(scale, 0, 0.1);
         cannonBlowUpRef.current.scale.set(scale, scale, scale);
-
         if (scale <= 0.01) {
           clearInterval(intervalID);
         }
       }
     };
-    api.collisionResponse.set(true);
     intervalID = setInterval(updateScale, 10);
-
     setTimeout(() => {
       scene.remove(cannonBlowUpRef.current);
       clearInterval(intervalID);
@@ -57,7 +69,7 @@ const CannonBlowUp = (props: any) => {
     };
   }, []);
   return (
-    <mesh ref={cannonBlowUpRef} name="cannonBlowUp">
+    <mesh ref={cannonBlowUpRef} name={"cannonBlowUp-" + id}>
       <sphereGeometry />
       <meshStandardMaterial color="red" />
     </mesh>

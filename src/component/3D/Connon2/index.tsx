@@ -4,16 +4,16 @@ import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import CannonBlowUp from "./CannonBlowUp";
 
+const disabledCollide = [
+  "tank-body",
+  "tank-turret",
+  "tank-gun",
+  "tank-track",
+  "cannon",
+  "cannonBlowUp",
+];
 const Connon = (props: any) => {
   const { id, args = [0.5], position = [0, -4, 0], setIsDestroyed } = props;
-  const disabledCollide = [
-    "tank-body",
-    "tank-turret",
-    "tank-gun",
-    "tank-track",
-    "ground",
-    "cannon",
-  ];
   const { scene }: any = useThree();
 
   const [cannonRef, api]: any = useSphere(() => ({
@@ -34,7 +34,12 @@ const Connon = (props: any) => {
       ) {
         return;
       }
-      if (e.body.name === "tank-hitbox-player" && e.target.name === "cannon")
+      if (
+        e.body?.name.includes("tank-hitbox-") ===
+          e.target.name.includes("cannon-") ||
+        e.body?.name.includes("cannonBlowUp-") ===
+          e.target.name.includes("cannon-")
+      )
         return;
       scene.remove(e.target);
       const position = new Vector3();
@@ -68,7 +73,6 @@ const Connon = (props: any) => {
     ];
     const bodyPosition2 = [0, 0, 0];
     api.applyLocalImpulse(impulse, bodyPosition2);
-    api.collisionResponse.set(true);
 
     timeoutId = setTimeout(() => {
       if (!cannonRef.current) return;
@@ -115,6 +119,7 @@ const CustomConnon = (props: any) => {
       ) : (
         <CannonBlowUp
           {...{
+            ...props,
             position: isDestroyed,
           }}
         />

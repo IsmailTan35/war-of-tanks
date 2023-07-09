@@ -1,18 +1,21 @@
 import { SocketContext } from "@/controller/Contex";
-import { cameraActions, useAppDispatch } from "@/store";
+import { cameraActions, useAppDispatch, useAppSelector } from "@/store";
 import { useContext, useEffect, useState } from "react";
 
 export const useControls = (vehicleApi, chassisApi) => {
   const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
+  const { spectatorMode } = useAppSelector(state => state.camera);
   let [controls, setControls] = useState({});
   const speed = 1550;
+
   useEffect(() => {
     const keyDownPressHandler = e => {
       if (e.key.toLowerCase() === "h") {
         dispatch(cameraActions.update());
         return;
       }
+      if (spectatorMode) return;
       setControls(controls => ({ ...controls, [e.key.toLowerCase()]: true }));
     };
 
@@ -29,7 +32,7 @@ export const useControls = (vehicleApi, chassisApi) => {
       window.removeEventListener("keydown", keyDownPressHandler);
       window.removeEventListener("keyup", keyUpPressHandler);
     };
-  }, []);
+  }, [spectatorMode]);
 
   useEffect(() => {
     if (!vehicleApi || !chassisApi) return;

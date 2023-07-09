@@ -66,7 +66,7 @@ const Name = () => {
             gap: 10,
           }}
         >
-          <div>Adınız Giriniz</div>
+          <div>Adınızı Giriniz</div>
           <div
             style={{
               border: "1px solid black",

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import react from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PointerLockControls } from "@react-three/drei";
 import MyScene from "../component/MyScene";
@@ -13,8 +13,7 @@ import { Provider } from "react-redux";
 import { store } from "@/store";
 
 export default function Home() {
-  const contolRef = useRef<any>();
-
+  const [showName, setShowName] = react.useState(true);
   return (
     <>
       <Provider store={store}>
@@ -42,11 +41,13 @@ export default function Home() {
               <FPSCounter />
               <PingCounter />
             </div>
-            <Name />
+            {showName ? <Name /> : null}
             <Canvas>
               <MyScene />
-              <PointerLockControls selector="#button" />
-              <OrbitControls ref={contolRef} />
+              <PointerLockControls
+                selector={showName ? "#button" : undefined}
+              />
+              <OrbitControls />
             </Canvas>
           </div>
         </SocketContext.Provider>
