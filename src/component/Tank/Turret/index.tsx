@@ -12,7 +12,7 @@ const Turret = (props: any) => {
   const socket: any = useContext<any>(SocketContext);
   const [degree, setDegree] = useState<{ x: number; y: number }>({
     x: 180,
-    y: 110,
+    y: 90,
   });
   const { spectatorMode } = useAppSelector(state => state.camera);
   const selectedCameraID = useAppSelector(state => state.camera.selectedID);
@@ -51,14 +51,23 @@ const Turret = (props: any) => {
     ref.current.rotation.y = angle;
     mainGunRef.current.rotation.z = angleY;
 
-    var target = new Vector3();
+    let target = new Vector3();
     mainGunRef.current.getWorldPosition(target);
 
     if (selectedCameraID !== 0) return;
-    var cameraDistance = 20;
-    state.camera.position.set(0, 5, -cameraDistance);
+    function transformDistance(input: number): number {
+      const angleDiff = 120 - 80;
+      const valueDiff = 40 - 15;
+      const angle = input - 80;
+      const y = 40 - (valueDiff * angle) / angleDiff;
+      return y;
+    }
+
+    const cameraDistance = transformDistance(degree.y);
+    const fixedCamPosY = 10 - (degree.y - 80) * (10 / 40);
+    state.camera.position.set(0, fixedCamPosY, -cameraDistance);
     state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angleX);
-    state.camera.lookAt(target.x, target.y, target.z);
+    state.camera.lookAt(target.x, target.y + 2, target.z);
   });
 
   return (
@@ -66,8 +75,20 @@ const Turret = (props: any) => {
       <group position={[0, 1, 1]} ref={ref} name={"turret" + id}>
         <mesh position={[0, 0, 0]}>
           <Cylinder args={[1, 1.3, 0.9, 60]}>
-            <Edges color="white" />
+            <Edges color={0x3e3f44} />
             <meshStandardMaterial color="darkgreen" />
+          </Cylinder>
+        </mesh>
+        <mesh position={[0, 0.5, -0.45]}>
+          <Cylinder args={[0.3, 0.3, 0.1, 60]}>
+            <Edges color="black" />
+            <meshStandardMaterial color={0x3e3f44} />
+          </Cylinder>
+        </mesh>
+        <mesh position={[0, 0.45, 0.45]}>
+          <Cylinder args={[0.25, 0.25, 0.1, 60]}>
+            <Edges color="black" />
+            <meshStandardMaterial color={0x3e3f44} />
           </Cylinder>
         </mesh>
         <MainGun {...{ id }} ref={mainGunRef}>

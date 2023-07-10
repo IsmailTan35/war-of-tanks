@@ -7,7 +7,7 @@ const Hull = () => {
       <mesh>
         <meshStandardMaterial color={0x637f0e} />
         <boxGeometry args={[3, 1, 5]} />
-        <Edges color="black" />
+        <Edges color={0x3e3f44} />
       </mesh>
     </>
   );

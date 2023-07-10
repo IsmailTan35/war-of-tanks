@@ -33,6 +33,7 @@ const Weaponry = (props: any) => {
       if (audio2) {
         audio2.play();
         setTimeout(() => {
+          audio2.currentTime = 0;
           audio2.pause();
         }, 1450);
       }
@@ -46,6 +47,7 @@ const Weaponry = (props: any) => {
     let timer: any;
 
     document.addEventListener("click", handleClicked);
+
     return () => {
       document.removeEventListener("click", handleClicked);
       clearInterval(intervalId);

@@ -20,22 +20,19 @@ const Tracks = (props: any) => {
       {show && (
         <mesh position={[direction == "left" ? 2 : -2, -1.5, 0]} ref={ref}>
           <mesh position={[-1.5, 0, 0]}>
-            <Sphere args={radius}>
-              <meshStandardMaterial color={0x222222} />
-              <Edges color={"black"} />
-            </Sphere>
+            <sphereGeometry args={[0.6, 16]} />
+            <meshStandardMaterial color={0x3e3f44} />
+            <Edges color={"black"} />
           </mesh>
           <mesh position={[0, 0, 0]}>
-            <Sphere args={radius}>
-              <meshStandardMaterial color={0x222222} />
-              <Edges color={"black"} />
-            </Sphere>
+            <sphereGeometry args={[0.6, 16]} />
+            <meshStandardMaterial color={0x3e3f44} />
+            <Edges color={"black"} />
           </mesh>
           <mesh position={[1.5, 0, 0]}>
-            <Sphere args={radius}>
-              <meshStandardMaterial color={0x222222} />
-              <Edges color={"black"} />
-            </Sphere>
+            <sphereGeometry args={[0.6, 16]} />
+            <meshStandardMaterial color={0x3e3f44} />
+            <Edges color={"black"} />
           </mesh>
         </mesh>
       )}

@@ -110,6 +110,7 @@ const CustomConnon = (props: any) => {
     props.explosionAudio.play();
     setTimeout(() => {
       props.explosionAudio.pause();
+      props.explosionAudio.currentTime = 0;
     }, 1350);
   }, [isDestroyed]);
   return (
