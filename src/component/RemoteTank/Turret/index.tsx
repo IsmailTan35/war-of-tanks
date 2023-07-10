@@ -38,6 +38,18 @@ const Turret = (props: any) => {
             <Edges color="white" />
             <meshStandardMaterial color="darkgreen" />
           </Cylinder>
+          <mesh position={[0, 0.5, -0.45]}>
+            <Cylinder args={[0.3, 0.3, 0.1, 60]}>
+              <Edges color="white" />
+              <meshStandardMaterial color="black" />
+            </Cylinder>
+          </mesh>
+          <mesh position={[0, 0.45, 0.45]}>
+            <Cylinder args={[0.25, 0.25, 0.1, 60]}>
+              <Edges color="white" />
+              <meshStandardMaterial color="black" />
+            </Cylinder>
+          </mesh>
         </mesh>
         <MainGun {...{ id }} ref={mainGunRef}>
           <Weaponry
