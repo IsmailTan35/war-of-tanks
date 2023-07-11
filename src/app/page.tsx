@@ -13,7 +13,10 @@ import { Provider } from "react-redux";
 import { store } from "@/store";
 
 export default function Home() {
-  const [showName, setShowName] = react.useState(true);
+  const [showName, setShowName] = react.useState(
+    process.env.NODE_ENV === "production" ? true : false
+  );
+
   return (
     <>
       <Provider store={store}>

@@ -7,6 +7,9 @@ const nextConfig = {
     });
     return config;
   },
+  env: {
+    NEXT_APP_URL_PRODUCTION: "https://64.226.68.146:11000",
+  },
 };
 
 module.exports = nextConfig;

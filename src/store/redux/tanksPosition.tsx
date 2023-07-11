@@ -3,14 +3,44 @@ import { createSlice } from "@reduxjs/toolkit";
 interface TanksPositionState {
   player: [number, number, number] | null;
   remotePlayers: { id: string; position: [number, number, number] }[];
+  rocks: [number, number, number][] | null[];
+  trees: [number, number, number][] | null[];
 }
+const divide = 200;
+
 const { reducer, actions } = createSlice({
   name: "user",
   initialState: {
     player: null,
     remotePlayers: [],
+    rocks: [],
+    trees: [],
   } as TanksPositionState,
   reducers: {
+    updateCustomPosition: (
+      state,
+      action: {
+        payload: {
+          id: number;
+          position: [number, number, number] | null;
+          type: "rocks" | "trees";
+        };
+      }
+    ) => {
+      const { type, id, position } = action.payload;
+
+      if (!position) {
+        state[type][id] = null;
+        return;
+      }
+      const fixedPosition: any = [
+        position[0] / divide,
+        position[1] / divide,
+        position[2] / divide,
+      ];
+      state[type][id] = fixedPosition;
+    },
+
     updatePosition: (
       state,
       action: { payload: [number, number, number] | null; type: string }
@@ -25,7 +55,6 @@ const { reducer, actions } = createSlice({
       }
     ) => {
       const { payload } = action;
-      const divide = 200;
 
       if (payload && payload.id && payload.position) {
         if (payload?.id && payload?.position) {

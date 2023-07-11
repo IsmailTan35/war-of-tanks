@@ -2,6 +2,7 @@ import React, { cloneElement, forwardRef } from "react";
 
 const SecondaryGun = forwardRef((props: any, ref: any) => {
   const { id } = props;
+
   return (
     <mesh
       name={"secondary-gun-" + id}
@@ -14,11 +15,14 @@ const SecondaryGun = forwardRef((props: any, ref: any) => {
         <sphereGeometry args={[0.3, 60]} />
         <meshStandardMaterial color={0x3e3f44} />
       </mesh>
-      <mesh position={[0, -0.4, 0.02]} name={"secondary-gun-barrel" + id}>
+      <mesh position={[0, -0.4, 0.02]} name={"secondary-gun-barrel-" + id}>
         <cylinderGeometry args={[0.08, 0.08, 0.2, 60]} />
         <meshStandardMaterial color={0x3e3f44} />
       </mesh>
-      <mesh name={"secondary-gun-vectorial" + id} position={[0, -4, 0]} />
+      <mesh
+        name={"secondary-gun-vectorial-barrel-" + id}
+        position={[0, -4, 0]}
+      />
       {props.children ? cloneElement(props.children, { id }) : null}
     </mesh>
   );

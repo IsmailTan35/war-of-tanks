@@ -6,7 +6,7 @@ const Rocks = (props: any) => {
   return (
     <>
       {Array.from({ length: 100 }, (_, index) => (
-        <Rock key={index} {...{ setSeed }} />
+        <Rock key={index} {...{ setSeed }} idx={index} />
       ))}
     </>
   );

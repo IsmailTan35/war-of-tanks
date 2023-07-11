@@ -6,7 +6,7 @@ const Trees = (props: any) => {
   return (
     <>
       {Array.from({ length: 500 }, (_, index) => (
-        <Tree key={index} {...{ setSeed }} />
+        <Tree key={index} {...{ setSeed }} idx={index} />
       ))}
     </>
   );

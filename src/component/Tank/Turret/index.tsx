@@ -6,6 +6,7 @@ import { SocketContext } from "@/controller/Contex";
 import { useAppSelector } from "@/store";
 import MainGun from "@/component/3D/MainGun";
 import Weaponry from "@/component/Tank/Weaponry";
+import SecondaryGun from "@/component/3D/SecondaryGun";
 
 const Turret = (props: any) => {
   const { id } = props;
@@ -98,6 +99,7 @@ const Turret = (props: any) => {
             }}
           />
         </MainGun>
+        <SecondaryGun {...{ id }} />
       </group>
     </>
   );

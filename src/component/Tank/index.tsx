@@ -46,6 +46,8 @@ const Tank = (props: any) => {
       onCollide: (e: any) => {
         if (spectatorMode) return;
         if (
+          e.body?.name?.replace("bullet-") ===
+            e.target?.name?.replace("tank-hitbox-") ||
           e.body?.name?.replace("cannon-") ===
             e.target?.name?.replace("tank-hitbox-") ||
           disableCollideNames.includes(e.body?.name) ||

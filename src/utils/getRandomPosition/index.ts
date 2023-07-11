@@ -1,6 +1,6 @@
 const getRandomPosition = (
-  min: number = -250,
-  max: number = 250,
+  min: number = -240,
+  max: number = 240,
   height: number = 4
 ): [number, number, number] => {
   const x = Math.random() * (max - min) + min;
@@ -16,8 +16,8 @@ function customRandom(number: number) {
 
 const getSeedRandomPosition = (
   seed: number,
-  min: number = -250,
-  max: number = 250,
+  min: number = -240,
+  max: number = 240,
   height: number = 4
 ): [number, number, number] => {
   const x = customRandom(seed + 1) * (max - min) + min;

@@ -1,3 +1,4 @@
+import { tanksPositionActions, useAppDispatch } from "@/store";
 import {
   getRandomPosition,
   getSeedRandomPosition,
@@ -7,6 +8,7 @@ import { useThree } from "@react-three/fiber";
 import React, { memo, useEffect } from "react";
 
 const Tree = (props: any) => {
+  const dispatch = useAppDispatch();
   const { scene } = useThree();
   const { setSeed } = props;
   const [treeRef, treeApi]: any = useBox(() => ({
@@ -16,6 +18,13 @@ const Tree = (props: any) => {
     collisionResponse: false,
     onCollide: e => {
       if (e.body?.name === "ground") return;
+      dispatch(
+        tanksPositionActions.updateCustomPosition({
+          id: props.idx,
+          type: "trees",
+          position: null,
+        })
+      );
       setTimeout(() => {
         scene.remove(treeRef.current);
         treeApi.collisionResponse.set(false);
@@ -28,6 +37,13 @@ const Tree = (props: any) => {
     setSeed((prev: any) => {
       const pst = getSeedRandomPosition(prev, undefined, undefined, 3);
       treeApi.position.set(pst[0], pst[1], pst[2]);
+      dispatch(
+        tanksPositionActions.updateCustomPosition({
+          id: props.idx,
+          position: pst,
+          type: "trees",
+        })
+      );
       treeApi.collisionResponse.set(true);
       return prev + 3;
     });
