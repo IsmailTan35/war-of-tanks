@@ -34,7 +34,7 @@ const SmokeParticles = (props: any) => {
 
   useEffect(() => {}, []);
   return (
-    <points ref={points} position={[0, -3.2, 0]}>
+    <points ref={points} position={[0, -3.2, 0]} name="smoke-particles">
       <sphereGeometry args={[0, 60, 60]} />
       <pointsMaterial color={0xaaaaaa} size={0.015} sizeAttenuation />
     </points>

@@ -71,10 +71,12 @@ const MyScene = () => {
       socket.off("users");
     };
   }, [socket]);
-
-  useEffect(() => {
-    const customPosition = getRandomPosition(undefined, undefined, 1);
+  async function attempt() {
+    const customPosition = await getRandomPosition(undefined, undefined, 1);
     setPosition(customPosition);
+  }
+  useEffect(() => {
+    attempt();
   }, []);
 
   return (
@@ -91,8 +93,8 @@ const MyScene = () => {
         })}
         {seed ? (
           <>
-            <Rocks {...{ setSeed }} />
-            <Trees {...{ setSeed }} />
+            <Rocks {...{ setSeed,seed }} />
+            <Trees {...{ setSeed,seed }} />
           </>
         ) : null}
         <BombardmentArea />

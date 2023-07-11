@@ -1,11 +1,8 @@
-import React, { memo, use, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useBox } from "@react-three/cannon";
 import { Sphere } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import {
-  getRandomPosition,
-  getSeedRandomPosition,
-} from "@/utils/getRandomPosition";
+
 import { tanksPositionActions, useAppDispatch } from "@/store";
 
 const disabledCollide = [
@@ -26,8 +23,7 @@ function Rock(props: any) {
     type: "Static",
     args,
     mass: 1500,
-    collisionResponse: false,
-    position: [...getRandomPosition(undefined, undefined, 2.5)],
+    position,
     onCollide: (e: any) => {
       if (!e.body?.name || disabledCollide.includes(e.body.name) || isCollided)
         return;
@@ -47,21 +43,14 @@ function Rock(props: any) {
   }, [stoneRef]);
 
   useEffect(() => {
-    if (!setSeed) return;
-    setSeed((prev: any) => {
-      const pst = getSeedRandomPosition(prev, undefined, undefined, 2.5);
-      stoneApi.position.set(pst[0], pst[1], pst[2]);
-      stoneApi.collisionResponse.set(true);
-      dispath(
-        tanksPositionActions.updateCustomPosition({
-          id: props.idx,
-          position: pst,
-          type: "rocks",
-        })
-      );
-      return prev + 3;
-    });
-  }, [setSeed]);
+    dispath(
+      tanksPositionActions.updateCustomPosition({
+        id: props.idx,
+        position,
+        type: "rocks",
+      })
+    );
+  }, [position]);
 
   return (
     <>

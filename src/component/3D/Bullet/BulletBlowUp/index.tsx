@@ -20,7 +20,7 @@ const BulletBlowUp = (props: any) => {
     onCollideBegin: (e: any) => {
       if (
         disabledCollide.includes(e.body?.name) ||
-        e.target?.name.replace("cannonBlowUp-", "") ===
+        e.target?.name.replace("bulletBlowUp-", "") ===
           e.body?.name.replace("tank-hitbox-", "")
       )
         return;
@@ -69,7 +69,7 @@ const BulletBlowUp = (props: any) => {
     };
   }, []);
   return (
-    <mesh ref={cannonBlowUpRef} name={"cannonBlowUp-" + id}>
+    <mesh ref={cannonBlowUpRef} name={"bulletBlowUp-" + id}>
       <sphereGeometry />
       <meshStandardMaterial color="red" />
     </mesh>

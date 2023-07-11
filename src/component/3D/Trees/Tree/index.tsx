@@ -10,12 +10,11 @@ import React, { memo, useEffect } from "react";
 const Tree = (props: any) => {
   const dispatch = useAppDispatch();
   const { scene } = useThree();
-  const { setSeed } = props;
+  const { position } = props;
   const [treeRef, treeApi]: any = useBox(() => ({
     args: [2.45, 6, 2.45],
     mass: 1,
-    position: [...getRandomPosition(undefined, undefined, 3)],
-    collisionResponse: false,
+    position,
     onCollide: e => {
       if (e.body?.name === "ground") return;
       dispatch(
@@ -33,21 +32,14 @@ const Tree = (props: any) => {
   }));
 
   useEffect(() => {
-    if (!setSeed) return;
-    setSeed((prev: any) => {
-      const pst = getSeedRandomPosition(prev, undefined, undefined, 3);
-      treeApi.position.set(pst[0], pst[1], pst[2]);
-      dispatch(
-        tanksPositionActions.updateCustomPosition({
-          id: props.idx,
-          position: pst,
-          type: "trees",
-        })
-      );
-      treeApi.collisionResponse.set(true);
-      return prev + 3;
-    });
-  }, [setSeed]);
+    dispatch(
+      tanksPositionActions.updateCustomPosition({
+        id: props.idx,
+        position,
+        type: "trees",
+      })
+    );
+  }, [position]);
 
   return (
     <>

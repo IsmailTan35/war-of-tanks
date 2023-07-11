@@ -45,6 +45,7 @@ const Tank = (props: any) => {
       },
       onCollide: (e: any) => {
         if (spectatorMode) return;
+        if (!e.body?.name || !e.target?.name) return;
         if (
           e.body?.name?.replace("bullet-") ===
             e.target?.name?.replace("tank-hitbox-") ||
@@ -54,6 +55,8 @@ const Tank = (props: any) => {
           (e.body?.name.includes("tank-hitbox-") &&
             e.target?.name.includes("tank-hitbox-")) ||
           e.body?.name.replace("cannonBlowUp-") ===
+            e.target?.name.replace("tank-hitbox-") ||
+          e.body?.name.replace("bulletBlowUp-") ===
             e.target?.name.replace("tank-hitbox-")
         )
           return;
@@ -61,6 +64,7 @@ const Tank = (props: any) => {
         console.log("hit", {
           hitPoint: -100,
         });
+
         e.target.userData.healtyPoint -= 100;
         if (e.target.userData?.healtyPoint <= 0) {
           setIsDestroyed(true);
@@ -203,14 +207,14 @@ const Tank = (props: any) => {
       <group ref={vehicle} name={"tank-" + id}>
         <Hitbox name={id} ref={chassisBody}>
           <Camera />
-          <group position={[0, -0.5, 0]}>
+          <group position={[0, -0.5, 0]} name="group--646">
             <Turret id={id} />
             <Hull />
           </group>
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
-          <group position={[0, 3, -0.1]} ref={nameRef}>
-            <mesh>
+          <group position={[0, 3, -0.1]} ref={nameRef} name="group--5565456">
+            <mesh name="group--584465">
               <boxGeometry args={[3, 1, 0.2]} />
               <meshBasicMaterial
                 color={0x000000}

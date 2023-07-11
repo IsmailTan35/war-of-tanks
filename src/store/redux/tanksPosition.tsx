@@ -3,8 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 interface TanksPositionState {
   player: [number, number, number] | null;
   remotePlayers: { id: string; position: [number, number, number] }[];
-  rocks: [number, number, number][] | null[];
-  trees: [number, number, number][] | null[];
+  rocks: any[];
+  trees: any[];
 }
 const divide = 200;
 
@@ -32,13 +32,14 @@ const { reducer, actions } = createSlice({
       if (!position) {
         state[type][id] = null;
         return;
+      } else {
+        const fixedPosition: [number, number, number] = [
+          position[0] / divide,
+          position[1] / divide,
+          position[2] / divide,
+        ];
+        state[type][id] = fixedPosition;
       }
-      const fixedPosition: any = [
-        position[0] / divide,
-        position[1] / divide,
-        position[2] / divide,
-      ];
-      state[type][id] = fixedPosition;
     },
 
     updatePosition: (

@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
@@ -13,7 +13,13 @@ const disabledCollide = [
   "bulletBlowUp",
 ];
 const Bullet = (props: any) => {
-  const { id, args = [0.3], position = [0, -4, 0], setIsDestroyed } = props;
+  const {
+    id,
+    args = [0.3],
+    position = [0, -4, -0.5],
+    setIsDestroyed,
+    idx,
+  } = props;
   const { scene }: any = useThree();
 
   const [bulletRef, api]: any = useSphere(() => ({
@@ -41,6 +47,8 @@ const Bullet = (props: any) => {
           e.target.name.includes("bullet-")
       )
         return;
+      if (e.body.name === e.target.name) return;
+      // bulletGroup.current[idx] = null;
       scene.remove(e.target);
       const position = new Vector3();
       e.target.getWorldPosition(position);
@@ -103,29 +111,31 @@ const Bullet = (props: any) => {
     </>
   );
 };
+
 const CustomBullet = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(null);
   useEffect(() => {
-    if (!isDestroyed || !props.explosionAudio) return;
-    props.explosionAudio.play();
     setTimeout(() => {
-      props.explosionAudio.pause();
-      props.explosionAudio.currentTime = 0;
-    }, 1350);
+      setIsDestroyed(null);
+    }, 5000);
   }, [isDestroyed]);
-  return (
-    <>
-      {!isDestroyed ? (
-        <Bullet {...{ ...props, setIsDestroyed }} />
-      ) : (
-        <BulletBlowUp
-          {...{
-            ...props,
-            position: isDestroyed,
-          }}
-        />
-      )}
-    </>
-  );
+  const denek = useMemo(() => {
+    return (
+      <>
+        {
+          !isDestroyed ? <Bullet {...{ ...props, setIsDestroyed }} /> : null
+          // (
+          //   <BulletBlowUp
+          //     {...{
+          //       ...props,
+          //       position: isDestroyed,
+          //     }}
+          //   />
+          // )
+        }
+      </>
+    );
+  }, [props.idx]);
+  return denek;
 };
-export default memo(CustomBullet);
+export default CustomBullet;

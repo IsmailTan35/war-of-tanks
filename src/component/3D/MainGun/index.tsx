@@ -5,7 +5,12 @@ const MainGun = forwardRef((props: any, ref: any) => {
   const { id } = props;
   return (
     <>
-      <mesh position={[1, 0, 0]} ref={ref} rotation={[0, 0, Math.PI / 2]}>
+      <mesh
+        position={[1, 0, 0]}
+        ref={ref}
+        rotation={[0, 0, Math.PI / 2]}
+        name="main-gun"
+      >
         <Cylinder
           args={[0.3, 0.3, 0.5, 60]}
           rotation={[Math.PI / 2, 0, 0]}
