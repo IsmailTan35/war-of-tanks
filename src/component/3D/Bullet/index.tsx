@@ -27,6 +27,9 @@ const Bullet = (props: any) => {
     args,
     position,
     collisionResponse: false,
+    userData: {
+      damage: 10,
+    },
     onCollideBegin: (e: any) => {
       if (!bulletRef.current || !e.body?.name || !e.target?.name) return;
       if (

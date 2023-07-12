@@ -41,9 +41,9 @@ const Tank = (props: any) => {
       mass: 1500,
       position,
       userData: {
-        healtyPoint: 1000,
+        healtyPoint: 500,
       },
-      onCollide: (e: any) => {
+      onCollideEnd: (e: any) => {
         if (spectatorMode) return;
         if (!e.body?.name || !e.target?.name) return;
         if (
@@ -62,19 +62,27 @@ const Tank = (props: any) => {
           return;
         if (e.target.userData.healtyPoint <= 0) return;
         console.log("hit", {
-          hitPoint: -100,
+          hitPoint: -e.body.userData.damage,
         });
 
-        e.target.userData.healtyPoint -= 100;
+        e.target.userData.healtyPoint -= e.body.userData.damage;
+        console.log(e.target.userData?.healtyPoint);
         if (e.target.userData?.healtyPoint <= 0) {
           setIsDestroyed(true);
           socket.emit("dead", {
             killerId: e.body.name.replace("cannon-", ""),
           });
           dispatch(cameraActions.updateSpectatorMode(true));
+          dispatch(cameraActions.update(1));
+          console.warn("10 seconds later you will be respawned...");
           setTimeout(() => {
-            dispatch(cameraActions.update(1));
-          }, 1000);
+            dispatch(cameraActions.updateSpectatorMode(false));
+            dispatch(cameraActions.update(0));
+            chassisBody.current.userData.healtyPoint = 500;
+            chassisApi.position.set(-1.5, 2, 3);
+            chassisApi.rotation.set(0, 0, 0);
+            console.warn("respawned...");
+          }, 10 * 1000);
         }
       },
     }),

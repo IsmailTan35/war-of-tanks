@@ -13,12 +13,32 @@ const Weaponry = (props: any) => {
   useEffect(() => {
     socket.on("remote-open-fire", (data: any) => {
       if (data.id !== id) return;
-      setCannonGroup((prev: any) => [...prev, Date.now()]);
-      setIsFire(Date.now());
+      setCannonGroup([]);
+      setTimeout(() => {
+        setCannonGroup((prev: any) => [...prev, Date.now()]);
+        setIsFire(Date.now());
+      }, 1);
     });
-    socket.on("remote-open-fire-machine-gun", (data: any) => {
+    socket.on("remote-open-firing-machine-gun", (data: any) => {
       if (data.id !== id) return;
-      setBulletGroup((prev: any) => [...prev, Date.now()]);
+      setBulletGroup((prev: any) => {
+        if (prev.length >= 49) {
+          let deleteBulletInterval: any;
+          setTimeout(() => {
+            deleteBulletInterval = setInterval(() => {
+              setBulletGroup((prev: any) => {
+                let fixed = [...prev];
+                fixed.shift();
+                if (fixed.length == 0) {
+                  clearInterval(deleteBulletInterval);
+                }
+                return fixed;
+              });
+            }, 100);
+          }, 500);
+        }
+        return [...prev, Date.now()];
+      });
       setIsFire(Date.now());
     });
     return () => {

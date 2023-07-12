@@ -12,6 +12,7 @@ const Turret = (props: any) => {
   const ref = useRef<any>(null);
   const socket: any = useContext<Socket>(SocketContext);
   const mainGunRef = useRef<any>();
+  const machineGunRef = useRef<any>();
 
   useEffect(() => {
     socket.on("remote-turret-rotation", (data: any) => {
@@ -24,6 +25,7 @@ const Turret = (props: any) => {
       if (data.id !== id) return;
       const angleY = MathUtils.degToRad(data.rotation.y);
       mainGunRef.current.rotation.z = angleY;
+      machineGunRef.current.rotation.z = angleY;
     });
     return () => {
       socket.off("remote-turret-rotation");
@@ -64,7 +66,7 @@ const Turret = (props: any) => {
             }}
           />
         </MainGun>
-        <SecondaryGun {...{ id }} />
+        <SecondaryGun {...{ id }} ref={machineGunRef} />
       </group>
     </>
   );

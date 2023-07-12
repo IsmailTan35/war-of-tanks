@@ -20,6 +20,7 @@ const Turret = (props: any) => {
 
   const ref = useRef<any>(null);
   const mainGunRef = useRef<any>();
+  const machineGunRef = useRef<any>();
 
   useEffect(() => {
     if (spectatorMode) return;
@@ -44,13 +45,14 @@ const Turret = (props: any) => {
 
   useFrame(state => {
     const turret = ref.current;
-    if (!mainGunRef.current || !turret) return;
+    if (!mainGunRef.current || !machineGunRef.current || !turret) return;
     var angle = MathUtils.degToRad(degree.x - 90);
     var angleX = MathUtils.degToRad(degree.x);
     var angleY = MathUtils.degToRad(degree.y);
 
     ref.current.rotation.y = angle;
     mainGunRef.current.rotation.z = angleY;
+    machineGunRef.current.rotation.z = angleY;
 
     let target = new Vector3();
     mainGunRef.current.getWorldPosition(target);
@@ -99,7 +101,7 @@ const Turret = (props: any) => {
             }}
           />
         </MainGun>
-        <SecondaryGun {...{ id }} />
+        <SecondaryGun {...{ id }} ref={machineGunRef} />
       </group>
     </>
   );

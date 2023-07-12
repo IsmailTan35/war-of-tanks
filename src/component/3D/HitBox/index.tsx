@@ -11,13 +11,7 @@ const Hitbox = forwardRef((props: IHitbox, ref: any) => {
 
   return (
     <>
-      <mesh
-        name={"tank-hitbox-" + name}
-        ref={ref}
-        userData={{
-          healtyPoint: 200,
-        }}
-      >
+      <mesh name={"tank-hitbox-" + name} ref={ref}>
         {false && (
           <>
             <boxGeometry args={hitArgs} />

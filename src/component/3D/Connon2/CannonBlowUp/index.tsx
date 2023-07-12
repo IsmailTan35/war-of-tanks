@@ -17,6 +17,9 @@ const CannonBlowUp = (props: any) => {
     position: [position.x, position.y, position.z],
     args: [5],
     type: "Static",
+    userData: {
+      damage: 100,
+    },
     onCollideBegin: (e: any) => {
       if (
         disabledCollide.includes(e.body?.name) ||
@@ -45,6 +48,7 @@ const CannonBlowUp = (props: any) => {
 
         if (scale >= targetScale - 0.01) {
           isScaling = false;
+          cannonBlowUpApi.collisionResponse.set(false);
         }
       } else {
         scale = THREE.MathUtils.lerp(scale, 0, 0.1);
@@ -59,7 +63,7 @@ const CannonBlowUp = (props: any) => {
       scene.remove(cannonBlowUpRef.current);
       clearInterval(intervalID);
       setIsDestroyed(true);
-    }, 1000);
+    }, 1250);
 
     return () => {
       clearTimeout(timeoutId);

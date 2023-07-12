@@ -4,7 +4,6 @@ import SmokeParticles from "../../3D/SmokeParticles";
 import { useAppSelector } from "@/store";
 import Connon2 from "../../3D/Connon2";
 import Bullet from "@/component/3D/Bullet";
-import { useThree } from "@react-three/fiber";
 
 const Weaponry = (props: any) => {
   const { id } = props;
@@ -18,15 +17,18 @@ const Weaponry = (props: any) => {
   const [bulletGroup, setBulletGroup] = useState<any>([]);
 
   useEffect(() => {
+    let isMachineGunCoolDown = false;
     function cannonFire() {
-      // setIsFire(Date.now);
+      setIsFire(Date.now);
       primaryGunTimer = 2.5;
       intervalId = setInterval((e: any) => {
         primaryGunTimer = primaryGunTimer - 0.5;
         if (!primaryGunTimer || primaryGunTimer <= 0) primaryGunTimer = null;
       }, 500);
+
       timeoutId = setTimeout(() => {
         clearInterval(intervalId);
+        setCannonGroup([]);
       }, 2500);
       socket.emit("triggerFiring");
       setCannonGroup((prv: any) => [...prv, Date.now()]);
@@ -40,41 +42,39 @@ const Weaponry = (props: any) => {
     }
     function bulletFire() {
       secondaryGunIntervalID = setInterval((e: any) => {
+        if (isMachineGunCoolDown) {
+          console.warn("machine gun cool down...");
+          return;
+        }
         setBulletGroup((prv: any) => {
-          if (prv.length > 50) {
-            console.log(prv.length);
-            // setBulletGroup([]);
-            clearInterval(secondaryGunIntervalID);
-            return prv;
-          }
-          if (audio2) {
-            audio2.play();
+          if (prv.length >= 49) {
+            isMachineGunCoolDown = true;
+            let deleteBulletInterval: any;
             setTimeout(() => {
-              audio2.currentTime = 0;
-              audio2.pause();
-            }, 1450);
+              deleteBulletInterval = setInterval(() => {
+                setBulletGroup((prv: any) => {
+                  let fixed = [...prv];
+                  fixed.shift();
+                  if (fixed.length == 0) {
+                    isMachineGunCoolDown = false;
+                    clearInterval(deleteBulletInterval);
+                  }
+                  return fixed;
+                });
+              }, 100);
+            }, 500);
           }
-
-          return [
-            ...prv,
-            <Bullet
-              key={prv.length}
-              {...{
-                id,
-                explosionAudio,
-                idx: prv.length,
-              }}
-            />,
-          ];
+          // if (audio2) {
+          //   audio2.play();
+          //   setTimeout(() => {
+          //     audio2.currentTime = 0;
+          //     audio2.pause();
+          //   }, 1450);
+          // }
+          socket.emit("triggerFiringMachineGun");
+          return [...prv, Date.now()];
         });
-        setIsFire(Date.now);
-        setTimeout(() => {
-          setBulletGroup((prv: any) => {
-            if (prv.length == 0) return prv;
-            prv.shift();
-            return prv;
-          });
-        }, 5000);
+        // setIsFire(Date.now);
       }, 100);
     }
     function handleClicked(e: any) {
@@ -135,7 +135,16 @@ const Weaponry = (props: any) => {
         </group>
         <group name="group-3">
           {bulletGroup.map((item: any, index: number) => {
-            return item;
+            return (
+              <Bullet
+                key={index}
+                {...{
+                  id,
+                  explosionAudio,
+                  idx: index,
+                }}
+              />
+            );
           })}
         </group>
       </group>

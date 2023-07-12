@@ -21,6 +21,9 @@ const Connon = (props: any) => {
     args,
     position,
     collisionResponse: false,
+    userData: {
+      damage: 50,
+    },
     onCollideBegin: (e: any) => {
       if (!cannonRef.current || !e.body?.name || !e.target?.name) return;
       if (
@@ -96,7 +99,13 @@ const Connon = (props: any) => {
 
   return (
     <>
-      <mesh ref={cannonRef} name={"cannon-" + id}>
+      <mesh
+        ref={cannonRef}
+        name={"cannon-" + id}
+        userData={{
+          damage: 50,
+        }}
+      >
         <sphereGeometry args={args} />
         <meshBasicMaterial color={"black"} />
       </mesh>
