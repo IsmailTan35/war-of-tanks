@@ -2,7 +2,7 @@ import React, { memo, useEffect, useMemo } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
-import BulletBlowUp from "./BulletBlowUp";
+import BulletBlowUp from "./CannonBlowUp";
 
 const disabledCollide = [
   "tank-body",
@@ -23,7 +23,7 @@ const Bullet = (props: any) => {
   const { scene }: any = useThree();
 
   const [bulletRef, api]: any = useSphere(() => ({
-    mass: 5,
+    mass: 1,
     args,
     position,
     collisionResponse: false,
@@ -49,7 +49,7 @@ const Bullet = (props: any) => {
         return;
       if (e.body.name === e.target.name) return;
       // bulletGroup.current[idx] = null;
-      scene.remove(e.target);
+      scene.remove(bulletRef.current);
       const position = new Vector3();
       e.target.getWorldPosition(position);
       setIsDestroyed(position);
@@ -92,7 +92,7 @@ const Bullet = (props: any) => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [scene, bulletRef, api]);
+  }, []);
 
   useEffect(() => {
     if (!bulletRef.current) return;
@@ -106,7 +106,8 @@ const Bullet = (props: any) => {
     <>
       <mesh ref={bulletRef} name={"bullet-" + id}>
         <sphereGeometry args={args} />
-        <meshBasicMaterial color={0xfbe119} />
+        {/* <meshBasicMaterial color={0xfbe119} /> */}
+        <meshBasicMaterial color={"black"} />
       </mesh>
     </>
   );
@@ -115,27 +116,29 @@ const Bullet = (props: any) => {
 const CustomBullet = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(null);
   useEffect(() => {
-    setTimeout(() => {
+    let timeoutID = setTimeout(() => {
       setIsDestroyed(null);
     }, 5000);
+    return () => {
+      clearTimeout(timeoutID);
+    };
   }, [isDestroyed]);
   const denek = useMemo(() => {
     return (
       <>
-        {
-          !isDestroyed ? <Bullet {...{ ...props, setIsDestroyed }} /> : null
-          // (
-          //   <BulletBlowUp
-          //     {...{
-          //       ...props,
-          //       position: isDestroyed,
-          //     }}
-          //   />
-          // )
-        }
+        {!isDestroyed ? (
+          <Bullet {...{ ...props, setIsDestroyed }} />
+        ) : (
+          <BulletBlowUp
+            {...{
+              ...props,
+              position: isDestroyed,
+            }}
+          />
+        )}
       </>
     );
   }, [props.idx]);
   return denek;
 };
-export default CustomBullet;
+export default memo(CustomBullet);

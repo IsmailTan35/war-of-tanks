@@ -40,26 +40,41 @@ const Weaponry = (props: any) => {
     }
     function bulletFire() {
       secondaryGunIntervalID = setInterval((e: any) => {
-        // socket.emit("triggerFiring");
-        setBulletGroup((prv: any) => [
-          ...prv,
-          <Bullet
-            key={Date.now()}
-            {...{
-              id,
-              explosionAudio,
-              idx: prv.length,
-            }}
-          />,
-        ]);
-        if (audio2) {
-          audio2.play();
-          setTimeout(() => {
-            audio2.currentTime = 0;
-            audio2.pause();
-          }, 1450);
-        }
+        setBulletGroup((prv: any) => {
+          if (prv.length > 50) {
+            console.log(prv.length);
+            // setBulletGroup([]);
+            clearInterval(secondaryGunIntervalID);
+            return prv;
+          }
+          if (audio2) {
+            audio2.play();
+            setTimeout(() => {
+              audio2.currentTime = 0;
+              audio2.pause();
+            }, 1450);
+          }
+
+          return [
+            ...prv,
+            <Bullet
+              key={prv.length}
+              {...{
+                id,
+                explosionAudio,
+                idx: prv.length,
+              }}
+            />,
+          ];
+        });
         setIsFire(Date.now);
+        setTimeout(() => {
+          setBulletGroup((prv: any) => {
+            if (prv.length == 0) return prv;
+            prv.shift();
+            return prv;
+          });
+        }, 5000);
       }, 100);
     }
     function handleClicked(e: any) {
@@ -82,8 +97,7 @@ const Weaponry = (props: any) => {
     document.addEventListener("mousedown", handleClicked);
     document.addEventListener("mouseup", e => {
       if (e.button === 2) {
-        console.log(e.button);
-        clearInterval(secondaryGunIntervalID);
+        if (secondaryGunIntervalID) clearInterval(secondaryGunIntervalID);
       }
     });
 
@@ -123,15 +137,6 @@ const Weaponry = (props: any) => {
           {bulletGroup.map((item: any, index: number) => {
             return item;
           })}
-          {/* {bullet && (
-            <Bullet
-              {...{
-                id,
-                explosionAudio,
-                idx: 0,
-              }}
-            />
-          )} */}
         </group>
       </group>
     </>
