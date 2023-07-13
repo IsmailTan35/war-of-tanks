@@ -1,24 +1,27 @@
 import React, { memo, useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "@/controller/Contex";
 import SmokeParticles from "../../3D/SmokeParticles";
-import { useAppSelector } from "@/store";
+import { ammoActions, useAppDispatch, useAppSelector } from "@/store";
 import Connon2 from "../../3D/Connon2";
 import Bullet from "@/component/3D/Bullet";
 
 const Weaponry = (props: any) => {
+  const dispacth = useAppDispatch();
   const { id } = props;
   const socket: any = useContext<any>(SocketContext);
   const explosionAudio = new Audio("audio/explosion.mp3");
   const audio2 = new Audio("audio/cannon-fire.mp3");
   const { spectatorMode } = useAppSelector(state => state.camera);
-
+  const { cannonAmmo } = useAppSelector(state => state.ammo);
   const [isFire, setIsFire] = useState<any>(null);
   const [cannonGroup, setCannonGroup] = useState<any>([]);
   const [bulletGroup, setBulletGroup] = useState<any>([]);
 
   useEffect(() => {
     let isMachineGunCoolDown = false;
+    let primaryGunAmmo = cannonAmmo;
     function cannonFire() {
+      if (!primaryGunAmmo) return console.warn("no ammo");
       setIsFire(Date.now);
       primaryGunTimer = 2.5;
       intervalId = setInterval((e: any) => {
@@ -31,6 +34,13 @@ const Weaponry = (props: any) => {
         setCannonGroup([]);
       }, 2500);
       socket.emit("triggerFiring");
+      dispacth(
+        ammoActions.decrease({
+          ammoType: "cannonAmmo",
+          ammoCount: 1,
+        })
+      );
+      primaryGunAmmo -= 1;
       setCannonGroup((prv: any) => [...prv, Date.now()]);
       if (audio2) {
         audio2.play();
@@ -59,6 +69,12 @@ const Weaponry = (props: any) => {
                     isMachineGunCoolDown = false;
                     clearInterval(deleteBulletInterval);
                   }
+                  dispacth(
+                    ammoActions.increase({
+                      ammoType: "machineGunAmmo",
+                      ammoCount: 1,
+                    })
+                  );
                   return fixed;
                 });
               }, 100);
@@ -72,6 +88,9 @@ const Weaponry = (props: any) => {
           //   }, 1450);
           // }
           socket.emit("triggerFiringMachineGun");
+          dispacth(
+            ammoActions.decrease({ ammoType: "machineGunAmmo", ammoCount: 1 })
+          );
           return [...prv, Date.now()];
         });
         // setIsFire(Date.now);

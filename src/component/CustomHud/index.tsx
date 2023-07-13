@@ -10,6 +10,8 @@ import { useAppSelector } from "@/store";
 
 const CustomHud = () => {
   const [myPosition, setMyPosition] = useState<any>([0, 0, 0]);
+  const { health } = useAppSelector(state => state.health);
+  const { cannonAmmo, machineGunAmmo } = useAppSelector(state => state.ammo);
   const position = useAppSelector(state => state.tanksPosition.player);
   const trees = useAppSelector(state => state.tanksPosition.trees);
   const rocks = useAppSelector(state => state.tanksPosition.rocks);
@@ -48,7 +50,7 @@ const CustomHud = () => {
               anchorY="middle"
               position={[0, 0, 0.2]}
             >
-              1
+              {cannonAmmo}
             </Text>
           </mesh>
           <mesh>
@@ -56,14 +58,14 @@ const CustomHud = () => {
             <meshBasicMaterial color="red" />
             <Edges color={"black"} />
             <Text
-              fontSize={0.5}
+              fontSize={0.4}
               letterSpacing={-0.1}
               color="white"
               anchorX="center"
               anchorY="middle"
               position={[0, 0, 0.2]}
             >
-              2
+              50/{machineGunAmmo}
             </Text>
           </mesh>
           <mesh position={[1, 0, 0]}>
@@ -71,14 +73,14 @@ const CustomHud = () => {
             <meshBasicMaterial color="red" />
             <Edges color={"black"} />
             <Text
-              fontSize={0.5}
+              fontSize={0.4}
               letterSpacing={-0.1}
               color="white"
               anchorX="center"
               anchorY="middle"
               position={[0, 0, 0.2]}
             >
-              3
+              {health}
             </Text>
           </mesh>
         </mesh>

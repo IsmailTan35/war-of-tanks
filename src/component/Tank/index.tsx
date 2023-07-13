@@ -13,6 +13,7 @@ import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   cameraActions,
+  healthActions,
   tanksPositionActions,
   useAppDispatch,
   useAppSelector,
@@ -67,6 +68,7 @@ const Tank = (props: any) => {
 
         e.target.userData.healtyPoint -= e.body.userData.damage;
         console.log(e.target.userData?.healtyPoint);
+        dispatch(healthActions.decrease({ healCount: e.body.userData.damage }));
         if (e.target.userData?.healtyPoint <= 0) {
           setIsDestroyed(true);
           socket.emit("dead", {
@@ -78,6 +80,7 @@ const Tank = (props: any) => {
           setTimeout(() => {
             dispatch(cameraActions.updateSpectatorMode(false));
             dispatch(cameraActions.update(0));
+            dispatch(healthActions.update({ healCount: 500 }));
             chassisBody.current.userData.healtyPoint = 500;
             chassisApi.position.set(-1.5, 2, 3);
             chassisApi.rotation.set(0, 0, 0);
