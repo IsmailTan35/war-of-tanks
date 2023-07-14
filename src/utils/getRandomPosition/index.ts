@@ -9,6 +9,29 @@ const getRandomPosition = (
   return [x, y, z];
 };
 
+const getRandomPositionInCircle = (
+  radius: number = 240,
+  height: number = 4
+): [number, number, number] => {
+  const angle = Math.random() * 2 * Math.PI;
+  const distance = Math.sqrt(Math.random()) * radius;
+  const x = distance * Math.cos(angle);
+  const y = height;
+  const z = distance * Math.sin(angle);
+  return [x, y, z];
+};
+const getRandomPositionInSphere = (
+  radius: number = 240
+): [number, number, number] => {
+  const u = Math.random();
+  const v = Math.random();
+  const theta = 2 * Math.PI * u;
+  const phi = Math.acos(2 * v - 1);
+  const x = radius * Math.sin(phi) * Math.cos(theta);
+  const y = radius * Math.sin(phi) * Math.sin(theta);
+  const z = radius * Math.cos(phi);
+  return [x, y, z];
+};
 function customRandom(number: number) {
   var x = Math.sin(number) * 10000;
   return x - Math.floor(x);
@@ -26,4 +49,9 @@ const getSeedRandomPosition = (
   return [x, y, z];
 };
 
-export { getRandomPosition, getSeedRandomPosition };
+export {
+  getRandomPosition,
+  getSeedRandomPosition,
+  getRandomPositionInCircle,
+  getRandomPositionInSphere,
+};

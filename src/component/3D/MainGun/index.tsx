@@ -1,8 +1,12 @@
 import { Cylinder, Edges } from "@react-three/drei";
 import React, { cloneElement, forwardRef } from "react";
+import GunSight from "../GunSight";
+import { useAppSelector } from "@/store";
 
 const MainGun = forwardRef((props: any, ref: any) => {
-  const { id } = props;
+  const { id, idx } = props;
+  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
+  const { spectatorMode } = useAppSelector(state => state.camera);
   return (
     <>
       <mesh
@@ -19,6 +23,9 @@ const MainGun = forwardRef((props: any, ref: any) => {
           <Edges color="black" />
           <meshStandardMaterial color={0x3e3f44} />
         </Cylinder>
+        {(!spectatorMode && id == "player") || selectedCameraID === idx + 1 ? (
+          <GunSight {...{ id }} />
+        ) : null}
         <mesh>
           <mesh position={[0, -1.5, 0]} name={"pipe" + id}>
             <Cylinder args={[0.1, 0.1, 2.5, 60]}>

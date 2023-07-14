@@ -10,10 +10,8 @@ import { getRandomPosition } from "@/utils/getRandomPosition";
 import BombardmentArea from "../3D/BombardmentArea";
 import CustomHud from "../CustomHud";
 import { cameraActions, tanksPositionActions, useAppDispatch } from "@/store";
-import { useThree } from "@react-three/fiber";
 
 const MyScene = () => {
-  const { scene }: any = useThree();
   const dispatch = useAppDispatch();
   const socket: any = useContext(SocketContext);
 
@@ -86,15 +84,14 @@ const MyScene = () => {
         <ambientLight intensity={0.3} />
         <directionalLight intensity={0.8} position={[5, 10, 5]} castShadow />
         <Ground />
-
         <Tank position={position} />
         {user.map((item: any, idx: number) => {
           return <RemoteTank key={idx} item={item} idx={idx} />;
         })}
         {seed ? (
           <>
-            <Rocks {...{ setSeed,seed }} />
-            <Trees {...{ setSeed,seed }} />
+            <Rocks {...{ setSeed, seed }} />
+            <Trees {...{ setSeed, seed }} />
           </>
         ) : null}
         <BombardmentArea />

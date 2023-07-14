@@ -1,7 +1,13 @@
-import React, { memo, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  use,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Cylinder, Edges } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { MathUtils, Vector3 } from "three";
+import { MathUtils } from "three";
 import { SocketContext } from "@/controller/Contex";
 import { useAppSelector } from "@/store";
 import MainGun from "@/component/3D/MainGun";
@@ -16,7 +22,6 @@ const Turret = (props: any) => {
     y: 90,
   });
   const { spectatorMode } = useAppSelector(state => state.camera);
-  const selectedCameraID = useAppSelector(state => state.camera.selectedID);
 
   const ref = useRef<any>(null);
   const mainGunRef = useRef<any>();
@@ -27,7 +32,7 @@ const Turret = (props: any) => {
     const handleMouseMove = (event: any) => {
       if (!event.movementX || !event.movementY) return;
       setDegree(prv => {
-        const dataX = prv.x - event.movementX * 0.2;
+        const dataX = prv.x - event.movementX * 0.3;
         const dataY = prv.y - event.movementY * 0.5;
         const fixedDataY = dataY > 120 ? 120 : dataY < 80 ? 80 : dataY;
         socket.emit("turret-rotation", { x: dataX - 90, y: fixedDataY });
@@ -41,37 +46,18 @@ const Turret = (props: any) => {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [spectatorMode]);
+  }, [spectatorMode, socket]);
 
-  useFrame(state => {
+  useEffect(() => {
     const turret = ref.current;
     if (!mainGunRef.current || !machineGunRef.current || !turret) return;
     var angle = MathUtils.degToRad(degree.x - 90);
-    var angleX = MathUtils.degToRad(degree.x);
     var angleY = MathUtils.degToRad(degree.y);
 
     ref.current.rotation.y = angle;
     mainGunRef.current.rotation.z = angleY;
     machineGunRef.current.rotation.z = angleY;
-
-    let target = new Vector3();
-    mainGunRef.current.getWorldPosition(target);
-
-    if (selectedCameraID !== 0) return;
-    function transformDistance(input: number): number {
-      const angleDiff = 120 - 80;
-      const valueDiff = 40 - 15;
-      const angle = input - 80;
-      const y = 40 - (valueDiff * angle) / angleDiff;
-      return y;
-    }
-
-    const cameraDistance = transformDistance(degree.y);
-    const fixedCamPosY = 10 - (degree.y - 80) * (10 / 40);
-    state.camera.position.set(0, fixedCamPosY, -cameraDistance);
-    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angleX);
-    state.camera.lookAt(target.x, target.y + 2, target.z);
-  });
+  }, [degree.x, degree.y]);
 
   return (
     <>
@@ -95,11 +81,13 @@ const Turret = (props: any) => {
           </Cylinder>
         </mesh>
         <MainGun {...{ id }} ref={mainGunRef}>
-          <Weaponry
-            {...{
-              id,
-            }}
-          />
+          <>
+            <Weaponry
+              {...{
+                id,
+              }}
+            />
+          </>
         </MainGun>
         <SecondaryGun {...{ id }} ref={machineGunRef} />
       </group>

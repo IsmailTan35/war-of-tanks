@@ -81,6 +81,7 @@ const CustomBlowUp = (props: any) => {
   useEffect(() => {
     if (!isDestroyed) return;
   }, [isDestroyed]);
+  console.log(isDestroyed);
   return (
     <>
       {!isDestroyed ? <BulletBlowUp {...{ ...props, setIsDestroyed }} /> : null}

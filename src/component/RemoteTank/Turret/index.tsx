@@ -8,7 +8,7 @@ import Weaponry from "../Weaponry";
 import SecondaryGun from "@/component/3D/SecondaryGun";
 
 const Turret = (props: any) => {
-  const { id } = props;
+  const { id, idx } = props;
   const ref = useRef<any>(null);
   const socket: any = useContext<Socket>(SocketContext);
   const mainGunRef = useRef<any>();
@@ -59,7 +59,7 @@ const Turret = (props: any) => {
             </Cylinder>
           </mesh>
         </mesh>
-        <MainGun {...{ id }} ref={mainGunRef}>
+        <MainGun {...{ id, idx }} ref={mainGunRef}>
           <Weaponry
             {...{
               id,

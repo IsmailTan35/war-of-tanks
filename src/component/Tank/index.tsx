@@ -10,7 +10,6 @@ import { WheelDebug } from "../3D/WheelDebug";
 import { Quaternion, Vector3 } from "three";
 import { SocketContext } from "@/controller/Contex";
 import { Text } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import {
   cameraActions,
   healthActions,
@@ -19,7 +18,7 @@ import {
   useAppSelector,
 } from "@/store";
 import Hitbox from "../3D/HitBox";
-import Destroy from "../3D/Destory";
+import Explosion from "../3D/Explosion";
 
 const width = 3.5;
 const height = 3;
@@ -35,7 +34,7 @@ const Tank = (props: any) => {
   const [name, setName] = useState<any>("");
   const nameRef = useRef<any>(null);
   const { spectatorMode } = useAppSelector(state => state.camera);
-  const [isDestroyed, setIsDestroyed] = useState<boolean>(false);
+  const [isExplosion, setIsExplosion] = useState<boolean>(false);
   const [chassisBody, chassisApi]: any = useBox(
     () => ({
       args: hitboxBodyArgs,
@@ -62,15 +61,15 @@ const Tank = (props: any) => {
         )
           return;
         if (e.target.userData.healtyPoint <= 0) return;
-        console.log("hit", {
-          hitPoint: -e.body.userData.damage,
-        });
 
         e.target.userData.healtyPoint -= e.body.userData.damage;
-        console.log(e.target.userData?.healtyPoint);
+        console.warn("hit", {
+          hitPoint: -e.body.userData.damage,
+          healtyPoint: e.target.userData.healtyPoint,
+        });
         dispatch(healthActions.decrease({ healCount: e.body.userData.damage }));
         if (e.target.userData?.healtyPoint <= 0) {
-          setIsDestroyed(true);
+          setIsExplosion(true);
           socket.emit("dead", {
             killerId: e.body.name.replace("cannon-", ""),
           });
@@ -78,12 +77,17 @@ const Tank = (props: any) => {
           dispatch(cameraActions.update(1));
           console.warn("10 seconds later you will be respawned...");
           setTimeout(() => {
+            setIsExplosion(false);
+          }, 1500);
+          setTimeout(() => {
             dispatch(cameraActions.updateSpectatorMode(false));
             dispatch(cameraActions.update(0));
             dispatch(healthActions.update({ healCount: 500 }));
             chassisBody.current.userData.healtyPoint = 500;
             chassisApi.position.set(-1.5, 2, 3);
             chassisApi.rotation.set(0, 0, 0);
+            chassisApi.velocity.set(0, 0, 0);
+            chassisApi.angularVelocity.set(0, 0, 0);
             console.warn("respawned...");
           }, 10 * 1000);
         }
@@ -198,12 +202,6 @@ const Tank = (props: any) => {
     };
   }, [chassisApi, spectatorMode]);
 
-  useFrame(({ camera }) => {
-    const cameraPosition = camera.position;
-    const textRotation = Math.atan2(cameraPosition.x, cameraPosition.z);
-    nameRef.current.rotation.y = textRotation;
-  });
-
   useEffect(() => {
     socket.on("set-name", (data: any) => {
       setName(data);
@@ -224,7 +222,7 @@ const Tank = (props: any) => {
           </group>
           <Tracks direction={"left"} />
           <Tracks direction={"right"} />
-          <group position={[0, 3, -0.1]} ref={nameRef} name="group--5565456">
+          <group position={[0, 2, -0.1]} ref={nameRef} name="group--5565456">
             <mesh name="group--584465">
               <boxGeometry args={[3, 1, 0.2]} />
               <meshBasicMaterial
@@ -244,7 +242,7 @@ const Tank = (props: any) => {
               {name}
             </Text>
           </group>
-          {isDestroyed && <Destroy />}
+          {isExplosion && <Explosion />}
         </Hitbox>
         {wheels.map((wheel: any, index: number) => (
           <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />
@@ -260,7 +258,7 @@ const Camera = (props: any) => {
     <PerspectiveCamera
       position={[10, -10, 10]}
       makeDefault={selectedCameraID == 0}
-      name="thirdPersonCamera"
+      name="thirdPersonCamera-player"
     />
   );
 };

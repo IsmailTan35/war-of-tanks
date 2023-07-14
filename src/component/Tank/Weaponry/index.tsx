@@ -9,8 +9,6 @@ const Weaponry = (props: any) => {
   const dispacth = useAppDispatch();
   const { id } = props;
   const socket: any = useContext<any>(SocketContext);
-  const explosionAudio = new Audio("audio/explosion.mp3");
-  const audio2 = new Audio("audio/cannon-fire.mp3");
   const { spectatorMode } = useAppSelector(state => state.camera);
   const { cannonAmmo } = useAppSelector(state => state.ammo);
   const [isFire, setIsFire] = useState<any>(null);
@@ -21,7 +19,7 @@ const Weaponry = (props: any) => {
     let isMachineGunCoolDown = false;
     let primaryGunAmmo = cannonAmmo;
     function cannonFire() {
-      if (!primaryGunAmmo) return console.warn("no ammo");
+      // if (!primaryGunAmmo) return console.warn("no ammo");
       setIsFire(Date.now);
       primaryGunTimer = 2.5;
       intervalId = setInterval((e: any) => {
@@ -42,13 +40,6 @@ const Weaponry = (props: any) => {
       );
       primaryGunAmmo -= 1;
       setCannonGroup((prv: any) => [...prv, Date.now()]);
-      if (audio2) {
-        audio2.play();
-        setTimeout(() => {
-          audio2.currentTime = 0;
-          audio2.pause();
-        }, 1450);
-      }
     }
     function bulletFire() {
       secondaryGunIntervalID = setInterval((e: any) => {
@@ -80,13 +71,7 @@ const Weaponry = (props: any) => {
               }, 100);
             }, 500);
           }
-          // if (audio2) {
-          //   audio2.play();
-          //   setTimeout(() => {
-          //     audio2.currentTime = 0;
-          //     audio2.pause();
-          //   }, 1450);
-          // }
+
           socket.emit("triggerFiringMachineGun");
           dispacth(
             ammoActions.decrease({ ammoType: "machineGunAmmo", ammoCount: 1 })
@@ -145,7 +130,6 @@ const Weaponry = (props: any) => {
                 key={index}
                 {...{
                   id,
-                  explosionAudio,
                   idx: index,
                 }}
               />
@@ -159,7 +143,6 @@ const Weaponry = (props: any) => {
                 key={index}
                 {...{
                   id,
-                  explosionAudio,
                   idx: index,
                 }}
               />

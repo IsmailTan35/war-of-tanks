@@ -3,6 +3,7 @@ import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import CannonBlowUp from "./CannonBlowUp";
+import DistanceAudio from "../DistanceAudio";
 
 const disabledCollide = [
   "tank-body",
@@ -38,10 +39,8 @@ const Connon = (props: any) => {
         return;
       }
       if (
-        e.body?.name.includes("tank-hitbox-") ===
-          e.target.name.includes("cannon-") ||
         e.body?.name.includes("cannonBlowUp-") ===
-          e.target.name.includes("cannon-")
+        e.target.name.includes("cannon-")
       )
         return;
       scene.remove(e.target);
@@ -99,13 +98,8 @@ const Connon = (props: any) => {
 
   return (
     <>
-      <mesh
-        ref={cannonRef}
-        name={"cannon-" + id}
-        userData={{
-          damage: 50,
-        }}
-      >
+      <mesh ref={cannonRef} name={"cannon-" + id}>
+        <DistanceAudio {...{ audioUrl: "audio/cannon-fire.mp3" }} />
         <sphereGeometry args={args} />
         <meshBasicMaterial color={"black"} />
       </mesh>
@@ -114,18 +108,13 @@ const Connon = (props: any) => {
 };
 const CustomConnon = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(null);
-  useEffect(() => {
-    if (!isDestroyed || !props.explosionAudio) return;
-    props.explosionAudio.play();
-    setTimeout(() => {
-      props.explosionAudio.pause();
-      props.explosionAudio.currentTime = 0;
-    }, 1350);
-  }, [isDestroyed]);
+
   return (
     <>
       {!isDestroyed ? (
-        <Connon {...{ ...props, setIsDestroyed }} />
+        <>
+          <Connon {...{ ...props, setIsDestroyed }} />
+        </>
       ) : (
         <CannonBlowUp
           {...{

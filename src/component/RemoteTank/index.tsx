@@ -10,9 +10,9 @@ import { WheelDebug } from "../3D/WheelDebug";
 import { PerspectiveCamera, Text } from "@react-three/drei";
 import HitBox from "../3D/HitBox";
 import { useAppSelector } from "@/store";
-import { MathUtils, Vector3 } from "three";
+import { Vector3 } from "three";
 import { SocketContext } from "@/controller/Contex";
-import Destroy from "../3D/Destory";
+import Explosion from "../3D/Explosion";
 
 const width = 3.5;
 const height = 3;
@@ -26,11 +26,10 @@ interface IRemoteTank {
   idx: number;
 }
 const RemoteTank = (props: IRemoteTank) => {
-  const [isDestroyed, setIsDestroyed] = useState<boolean>(false);
+  const [isExplosion, setIsExplosion] = useState<boolean>(false);
   const socket: any = useContext(SocketContext);
   const { position = [0, 2, 0], item, idx } = props;
   const selectedCameraID = useAppSelector(state => state.camera.selectedID);
-  const { spectatorMode } = useAppSelector(state => state.camera);
   const { scene } = useThree();
   const nameRef = useRef<any>(null);
 
@@ -70,54 +69,21 @@ const RemoteTank = (props: IRemoteTank) => {
     };
   }, []);
 
-  const [degreX, setDegreX] = useState(180);
-  const [degreY, setDegreY] = useState(110);
-
-  const handleMouseMove = (event: any) => {
-    setDegreX(prv => prv - event.movementX * 0.2);
-    setDegreY(prv => {
-      const fixedData = prv - event.movementY * 2;
-      const result = fixedData > 120 ? 120 : fixedData < 80 ? 80 : fixedData;
-      return result;
-    });
-  };
-
-  useEffect(() => {
-    if (spectatorMode) return;
-    if (!selectedCameraID || selectedCameraID !== idx + 1) return;
-    document.body.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [selectedCameraID, spectatorMode]);
-
-  useFrame(({ camera }) => {
-    //namebox rotation
-    const cameraPosition = camera.position;
-    const textRotation = Math.atan2(cameraPosition.x, cameraPosition.z);
-    nameRef.current.rotation.y = textRotation;
-  });
-
   useFrame(state => {
     if (!selectedCameraID || selectedCameraID !== idx + 1) return;
     if (!chassisBody.current) return;
     var target = new Vector3();
     chassisBody.current.getWorldPosition(target);
-    var angle = MathUtils.degToRad(degreX);
-    var angleY = MathUtils.degToRad(degreY);
-
-    if (selectedCameraID === 0) return;
-    var cameraDistance = 20;
-    state.camera.position.set(0, 5, -cameraDistance);
-    state.camera.position.applyAxisAngle(new Vector3(0, 1, 0), angle);
-    state.camera.lookAt(target.x, target.y, target.z);
   });
 
   useEffect(() => {
     socket.on("remote-dead", (data: any) => {
       if (data.victimId === item.id) {
-        setIsDestroyed(true);
+        setIsExplosion(true);
         chassisBody.current.userData.isDestroyed = true;
+        setTimeout(() => {
+          setIsExplosion(false);
+        }, 1500);
       }
     });
     return () => {
@@ -128,9 +94,9 @@ const RemoteTank = (props: IRemoteTank) => {
     <>
       <group ref={vehicle} name={"tank" + item.id}>
         <HitBox ref={chassisBody} name={item.id}>
-          <Camera idx={idx} />
+          <Camera {...{ idx, id: item.id }} />
           <group position={[0, -0.5, 0]}>
-            <Turret id={item.id} />
+            <Turret id={item.id} {...{ idx }} />
             <Hull />
           </group>
           <Tracks direction={"left"} />
@@ -162,7 +128,7 @@ const RemoteTank = (props: IRemoteTank) => {
               {item.name}
             </Text>
           </group>
-          {isDestroyed && <Destroy />}
+          {isExplosion && <Explosion />}
         </HitBox>
         {wheels.map((wheel: any, index: number) => (
           <WheelDebug wheelRef={wheel} radius={wheelRadius} key={index} />
@@ -172,12 +138,13 @@ const RemoteTank = (props: IRemoteTank) => {
   );
 };
 const Camera = (props: any) => {
+  const { idx, id } = props;
   const selectedCameraID = useAppSelector(state => state.camera.selectedID);
   return (
     <PerspectiveCamera
       position={[10, -10, 10]}
-      makeDefault={selectedCameraID === props.idx + 1}
-      name="thirdPersonCamera"
+      makeDefault={selectedCameraID === idx + 1}
+      name={"thirdPersonCamera-" + id}
     />
   );
 };

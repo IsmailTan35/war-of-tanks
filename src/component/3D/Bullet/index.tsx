@@ -2,7 +2,7 @@ import React, { memo, useEffect, useMemo } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
-import BulletBlowUp from "./CannonBlowUp";
+import BulletBlowUp from "./BulletBlowUp";
 
 const disabledCollide = [
   "tank-body",
@@ -13,30 +13,25 @@ const disabledCollide = [
   "bulletBlowUp",
 ];
 const Bullet = (props: any) => {
-  const {
-    id,
-    args = [0.3],
-    position = [0, -4, -0.5],
-    setIsDestroyed,
-    idx,
-  } = props;
+  const { id, args = [0.3], position = [0, -4, -0.5], setIsDestroyed } = props;
   const { scene }: any = useThree();
 
   const [bulletRef, api]: any = useSphere(() => ({
-    mass: 1,
+    mass: 5,
     args,
     position,
     collisionResponse: false,
     userData: {
       damage: 10,
     },
-    onCollideBegin: (e: any) => {
+    onCollide: (e: any) => {
       if (!bulletRef.current || !e.body?.name || !e.target?.name) return;
       if (
         e.body.name === "tank-hitbox-player" &&
         e.target.name === "bullet-player"
       )
         return;
+
       if (
         disabledCollide.includes(e.body.name) ||
         e.body.name === "tank-hitbox-" + id
@@ -44,14 +39,10 @@ const Bullet = (props: any) => {
         return;
       }
       if (
-        e.body?.name.includes("tank-hitbox-") ===
-          e.target.name.includes("bullet-") ||
         e.body?.name.includes("bulletBlowUp-") ===
-          e.target.name.includes("bullet-")
+        e.target.name.includes("bullet-")
       )
         return;
-      if (e.body.name === e.target.name) return;
-      // bulletGroup.current[idx] = null;
       scene.remove(bulletRef.current);
       const position = new Vector3();
       e.target.getWorldPosition(position);
@@ -76,7 +67,7 @@ const Bullet = (props: any) => {
     vectorialBarrelTarget?.getWorldPosition(vectorialBarrelTargetTarget);
     api.position.set(turretTarget.x, turretTarget.y, turretTarget.z);
 
-    const force = 1000;
+    const force = 5000;
     const impulse = [
       (vectorialBarrelTargetTarget.x - turretTarget.x) * force,
       (vectorialBarrelTargetTarget.y - turretTarget.y) * force,
@@ -95,7 +86,7 @@ const Bullet = (props: any) => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [api, bulletRef, id, scene]);
 
   useEffect(() => {
     if (!bulletRef.current) return;
@@ -126,6 +117,7 @@ const CustomBullet = (props: any) => {
       clearTimeout(timeoutID);
     };
   }, [isDestroyed]);
+
   const denek = useMemo(() => {
     return (
       <>

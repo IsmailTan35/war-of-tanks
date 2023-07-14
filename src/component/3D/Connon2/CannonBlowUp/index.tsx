@@ -2,6 +2,7 @@ import React, { memo, useEffect } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import DistanceAudio from "../../DistanceAudio";
 
 const disabledCollide = [
   "ground",
@@ -15,8 +16,10 @@ const CannonBlowUp = (props: any) => {
   const { scene }: any = useThree();
   const [cannonBlowUpRef, cannonBlowUpApi]: any = useSphere(() => ({
     position: [position.x, position.y, position.z],
-    args: [5],
+    args: [3],
     type: "Static",
+    mass: 5,
+    collisionResponse: false,
     userData: {
       damage: 100,
     },
@@ -28,8 +31,6 @@ const CannonBlowUp = (props: any) => {
       )
         return;
     },
-    mass: 5,
-    collisionResponse: false,
   }));
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const CannonBlowUp = (props: any) => {
   }, []);
   return (
     <mesh ref={cannonBlowUpRef} name={"cannonBlowUp-" + id}>
+      <DistanceAudio {...{ audioUrl: "audio/explosion.mp3" }} />
       <sphereGeometry />
       <meshStandardMaterial color="red" />
     </mesh>
@@ -87,7 +89,11 @@ const CustomBlowUp = (props: any) => {
   }, [isDestroyed]);
   return (
     <>
-      {!isDestroyed ? <CannonBlowUp {...{ ...props, setIsDestroyed }} /> : null}
+      {!isDestroyed ? (
+        <>
+          <CannonBlowUp {...{ ...props, setIsDestroyed }} />
+        </>
+      ) : null}
     </>
   );
 };
