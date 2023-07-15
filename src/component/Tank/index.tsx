@@ -61,7 +61,7 @@ const Tank = (props: any) => {
         )
           return;
         if (e.target.userData.healtyPoint <= 0) return;
-
+        console.log(e.body);
         e.target.userData.healtyPoint -= e.body.userData.damage;
         console.warn("hit", {
           hitPoint: -e.body.userData.damage,

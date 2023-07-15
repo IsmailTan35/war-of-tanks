@@ -17,6 +17,9 @@ const BulletBlowUp = (props: any) => {
     position: [position.x, position.y, position.z],
     args: [2],
     type: "Static",
+    userData: {
+      damage: 10,
+    },
     onCollideBegin: (e: any) => {
       if (
         disabledCollide.includes(e.body?.name) ||
