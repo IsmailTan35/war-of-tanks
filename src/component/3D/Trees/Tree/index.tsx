@@ -1,9 +1,5 @@
 import { tanksPositionActions, useAppDispatch } from "@/store";
-import {
-  getRandomPosition,
-  getSeedRandomPosition,
-} from "@/utils/getRandomPosition";
-import { useBox } from "@react-three/cannon";
+import { useBox, useCylinder, useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import React, { memo, useEffect } from "react";
 
@@ -11,11 +7,12 @@ const Tree = (props: any) => {
   const dispatch = useAppDispatch();
   const { scene } = useThree();
   const { position } = props;
+  const args: any = [3, 3, 6];
   const [treeRef, treeApi]: any = useBox(() => ({
-    args: [2.45, 6, 2.45],
+    args: args,
     mass: 1,
     position,
-    onCollide: e => {
+    onCollideEnd: e => {
       if (e.body?.name === "ground") return;
       dispatch(
         tanksPositionActions.updateCustomPosition({
@@ -44,7 +41,7 @@ const Tree = (props: any) => {
   return (
     <>
       <mesh ref={treeRef} name="tree">
-        <group position={[0, -1, 0]}>
+        <group position={[0, 0, 0]}>
           <mesh position={[0, 3.5, 0]}>
             <coneGeometry args={[0.5, 1, 16]} />
             <meshStandardMaterial color="green" />

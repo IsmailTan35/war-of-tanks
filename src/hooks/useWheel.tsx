@@ -14,7 +14,7 @@ export const useWheels = (width: any, height: any, front: any, radius: any) => {
   const wheelInfo: WheelInfoOptions = {
     radius,
     directionLocal: [0, -1, 0],
-    axleLocal: [1, 0, 0],
+    axleLocal: [-1, 0, 0],
     suspensionStiffness: 60,
     suspensionRestLength: 0.1,
     frictionSlip: 5,

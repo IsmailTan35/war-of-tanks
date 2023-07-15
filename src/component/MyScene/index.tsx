@@ -79,7 +79,19 @@ const MyScene = () => {
 
   return (
     <>
-      <Physics broadphase="SAP" gravity={[0, -10, 0]}>
+      <Physics
+        broadphase="SAP"
+        gravity={[0, -10, 0]}
+        defaultContactMaterial={{
+          contactEquationRelaxation: 4,
+          friction: 1e-3,
+          restitution: 0.01,
+          contactEquationStiffness: 1e8,
+          frictionEquationStiffness: 1e8,
+          frictionEquationRelaxation: 3,
+        }}
+        iterations={10}
+      >
         <CustomHud />
         <ambientLight intensity={0.3} />
         <directionalLight intensity={0.8} position={[5, 10, 5]} castShadow />

@@ -43,6 +43,8 @@ const Connon = (props: any) => {
         e.target.name.includes("cannon-")
       )
         return;
+      console.log(e.target.name);
+
       scene.remove(e.target);
       const position = new Vector3();
       e.target.getWorldPosition(position);
@@ -106,6 +108,7 @@ const Connon = (props: any) => {
     </>
   );
 };
+
 const CustomConnon = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(null);
 

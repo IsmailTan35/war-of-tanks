@@ -1,11 +1,4 @@
-import React, {
-  memo,
-  use,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useContext, useEffect, useRef, useState } from "react";
 import { Cylinder, Edges } from "@react-three/drei";
 import { MathUtils } from "three";
 import { SocketContext } from "@/controller/Contex";
@@ -17,10 +10,6 @@ import SecondaryGun from "@/component/3D/SecondaryGun";
 const Turret = (props: any) => {
   const { id } = props;
   const socket: any = useContext<any>(SocketContext);
-  const [degree, setDegree] = useState<{ x: number; y: number }>({
-    x: 180,
-    y: 90,
-  });
   const { spectatorMode } = useAppSelector(state => state.camera);
 
   const ref = useRef<any>(null);
@@ -29,35 +18,28 @@ const Turret = (props: any) => {
 
   useEffect(() => {
     if (spectatorMode) return;
+    let degreeX = 180;
+    let degreeY = 90;
+
     const handleMouseMove = (event: any) => {
+      degreeX = degreeX - event.movementX * 0.3;
+      const dataY = degreeY - event.movementY * 0.5;
+      degreeY = dataY > 120 ? 120 : dataY < 80 ? 80 : dataY;
+      socket.emit("turret-rotation", { x: degreeX - 90, y: degreeY });
+
+      var angle = MathUtils.degToRad(degreeX - 90);
+      var angleY = MathUtils.degToRad(degreeY);
+
+      ref.current.rotation.y = angle;
+      mainGunRef.current.rotation.z = angleY;
+      machineGunRef.current.rotation.z = angleY;
       if (!event.movementX || !event.movementY) return;
-      setDegree(prv => {
-        const dataX = prv.x - event.movementX * 0.3;
-        const dataY = prv.y - event.movementY * 0.5;
-        const fixedDataY = dataY > 120 ? 120 : dataY < 80 ? 80 : dataY;
-        socket.emit("turret-rotation", { x: dataX - 90, y: fixedDataY });
-        return {
-          x: dataX,
-          y: fixedDataY,
-        };
-      });
     };
     document.addEventListener("mousemove", handleMouseMove);
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [spectatorMode, socket]);
-
-  useEffect(() => {
-    const turret = ref.current;
-    if (!mainGunRef.current || !machineGunRef.current || !turret) return;
-    var angle = MathUtils.degToRad(degree.x - 90);
-    var angleY = MathUtils.degToRad(degree.y);
-
-    ref.current.rotation.y = angle;
-    mainGunRef.current.rotation.z = angleY;
-    machineGunRef.current.rotation.z = angleY;
-  }, [degree.x, degree.y]);
 
   return (
     <>

@@ -2,8 +2,13 @@ import { useThree } from "@react-three/fiber";
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { PositionalAudioHelper } from "three/examples/jsm/helpers/PositionalAudioHelper";
-const DistanceAudio = (props: any) => {
-  const { audioUrl } = props;
+
+interface IDistanceAudio {
+  audioUrl: string;
+  time?: number;
+}
+const DistanceAudio = (props: IDistanceAudio) => {
+  const { audioUrl, time = 1350 } = props;
   const soundRef = useRef<any>();
   const { camera, scene } = useThree();
 
@@ -22,7 +27,7 @@ const DistanceAudio = (props: any) => {
       sound.setRefDistance(150);
       sound.play();
     });
-    const helper = new PositionalAudioHelper(sound, 0.1);
+    const helper = new PositionalAudioHelper(sound, 0);
     sound.add(helper);
 
     const mesh = new THREE.Mesh();
@@ -34,7 +39,7 @@ const DistanceAudio = (props: any) => {
     setTimeout(() => {
       camera.remove(listener);
       sound.setVolume(0);
-    }, 1350);
+    }, time);
 
     return () => {
       if (!soundRef.current) return;

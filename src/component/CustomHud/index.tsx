@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, use, useEffect, useRef, useState } from "react";
 import {
   Edges,
   Environment,
@@ -18,7 +18,8 @@ const CustomHud = () => {
   const remotePlayers = useAppSelector(
     state => state.tanksPosition.remotePlayers
   );
-
+  const cameraOrtho = useRef<any>();
+  const [zoom, setZoom] = useState(75);
   useEffect(() => {
     const divede = 200;
     if (position) {
@@ -30,10 +31,24 @@ const CustomHud = () => {
     }
   }, [position]);
 
+  useEffect(() => {
+    function resize() {
+      const width = window.innerWidth / 2;
+      const height = window.innerHeight / 2;
+      console.log((width / height) * 50);
+      setZoom((width / height) * 50);
+    }
+    window.addEventListener("resize", resize);
+  }, []);
   return (
     <>
       <Hud>
-        <OrthographicCamera makeDefault position={[0, 0, 2]} zoom={75} />
+        <OrthographicCamera
+          makeDefault
+          position={[0, 0, 2]}
+          zoom={zoom}
+          ref={cameraOrtho}
+        />
         <Environment preset="forest" />
         <mesh position={[-5, -4.5, 0]}>
           <boxGeometry args={[3.1, 1.1, 0.2]} />

@@ -3,6 +3,7 @@ import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import BulletBlowUp from "./BulletBlowUp";
+import DistanceAudio from "../DistanceAudio";
 
 const disabledCollide = [
   "tank-body",
@@ -24,7 +25,7 @@ const Bullet = (props: any) => {
     userData: {
       damage: 10,
     },
-    onCollide: (e: any) => {
+    onCollideBegin: (e: any) => {
       if (!bulletRef.current || !e.body?.name || !e.target?.name) return;
       if (
         e.body.name === "tank-hitbox-player" &&
@@ -99,8 +100,8 @@ const Bullet = (props: any) => {
   return (
     <>
       <mesh ref={bulletRef} name={"bullet-" + id}>
+        <DistanceAudio {...{ audioUrl: "audio/machine-gun.mp3", time: 1000 }} />
         <sphereGeometry args={args} />
-        {/* <meshBasicMaterial color={0xfbe119} /> */}
         <meshBasicMaterial color={"black"} />
       </mesh>
     </>
@@ -109,31 +110,20 @@ const Bullet = (props: any) => {
 
 const CustomBullet = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(null);
-  useEffect(() => {
-    let timeoutID = setTimeout(() => {
-      setIsDestroyed(null);
-    }, 5000);
-    return () => {
-      clearTimeout(timeoutID);
-    };
-  }, [isDestroyed]);
 
-  const denek = useMemo(() => {
-    return (
-      <>
-        {!isDestroyed ? (
-          <Bullet {...{ ...props, setIsDestroyed }} />
-        ) : (
-          <BulletBlowUp
-            {...{
-              ...props,
-              position: isDestroyed,
-            }}
-          />
-        )}
-      </>
-    );
-  }, [props.idx]);
-  return denek;
+  return (
+    <>
+      {!isDestroyed ? (
+        <Bullet {...{ ...props, setIsDestroyed }} />
+      ) : (
+        <BulletBlowUp
+          {...{
+            ...props,
+            position: isDestroyed,
+          }}
+        />
+      )}
+    </>
+  );
 };
 export default memo(CustomBullet);

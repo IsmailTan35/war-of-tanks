@@ -24,7 +24,7 @@ const SecondaryGun = forwardRef((props: any, ref: any) => {
       </mesh>
       <mesh
         name={"secondary-gun-vectorial-barrel-" + id}
-        position={[0, -2, 0]}
+        position={[0, -2, 0.025]}
       ></mesh>
       {props.children ? cloneElement(props.children, { id }) : null}
     </mesh>

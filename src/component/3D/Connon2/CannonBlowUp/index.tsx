@@ -84,9 +84,7 @@ const CannonBlowUp = (props: any) => {
 
 const CustomBlowUp = (props: any) => {
   const [isDestroyed, setIsDestroyed] = React.useState(false);
-  useEffect(() => {
-    if (!isDestroyed) return;
-  }, [isDestroyed]);
+
   return (
     <>
       {!isDestroyed ? (
