@@ -8,7 +8,7 @@ export const url: any = () => {
   const parsed: any = window.location.hostname.split(".");
   const protocol: any = window.location.protocol;
   return parsed.includes("ismailtan")
-    ? process.env.REACT_APP_API_URL
+    ? process.env.NEXT_APP_URL_PRODUCTION
     : `${protocol}//${hostname}:11000`;
 };
 export const client = io(
