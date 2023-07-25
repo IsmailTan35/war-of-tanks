@@ -46,6 +46,14 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
         data.position.w
       );
     });
+    socket.on("velocity", data => {
+      if ("tank-hitbox-" + data.id !== chassisApi.name) return;
+      chassisApi.velocity.set(
+        data.position.x,
+        data.position.y,
+        data.position.z
+      );
+    });
     socket.on("remote-hand-break", data => {
       if ("tank-hitbox-" + data.id !== chassisApi.name) return;
       chassisApi.velocity.set(0, 0, 0);

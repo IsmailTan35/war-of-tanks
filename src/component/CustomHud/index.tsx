@@ -11,7 +11,8 @@ import { useAppSelector } from "@/store";
 const CustomHud = () => {
   const [myPosition, setMyPosition] = useState<any>([0, 0, 0]);
   const { health } = useAppSelector(state => state.health);
-  const { cannonAmmo, machineGunAmmo } = useAppSelector(state => state.ammo);
+  const machineGunAmmo = useAppSelector(state => state.ammo.machineGunAmmo);
+  const cannonAmmo = useAppSelector(state => state.ammo.cannonAmmo);
   const position = useAppSelector(state => state.tanksPosition.player);
   const trees = useAppSelector(state => state.tanksPosition.trees);
   const rocks = useAppSelector(state => state.tanksPosition.rocks);
@@ -35,7 +36,6 @@ const CustomHud = () => {
     function resize() {
       const width = window.innerWidth / 2;
       const height = window.innerHeight / 2;
-      console.log((width / height) * 50);
       setZoom((width / height) * 50);
     }
     window.addEventListener("resize", resize);

@@ -33,7 +33,7 @@ const { reducer, actions } = createSlice({
         };
       }
     ) => {
-      const { ammoType, ammoCount } = action.payload;
+      const { ammoType, ammoCount = 0 } = action.payload;
       state[ammoType] += ammoCount;
     },
     decrease: (
@@ -45,7 +45,7 @@ const { reducer, actions } = createSlice({
         };
       }
     ) => {
-      const { ammoType, ammoCount } = action.payload;
+      const { ammoType, ammoCount = 0 } = action.payload;
       state[ammoType] -= ammoCount;
     },
   },
