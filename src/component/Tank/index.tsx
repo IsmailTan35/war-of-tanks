@@ -168,11 +168,37 @@ const Tank = (props: any) => {
       });
     };
 
+    const handleVelocityChange = (newVelocity: any) => {
+      const target: any = new Vector3();
+      chassisBody.current.getWorldPosition(target);
+
+      socket.emit("velocity", {
+        x: newVelocity[0],
+        y: newVelocity[1],
+        z: newVelocity[2],
+      });
+    };
+    const handleAngularVelocityChange = (newVelocity: any) => {
+      const target: any = new Vector3();
+      chassisBody.current.getWorldPosition(target);
+      socket.emit("angular-velocity", {
+        x: newVelocity.x,
+        y: newVelocity.y,
+        z: newVelocity.z,
+      });
+    };
     const unsubscribePosition =
       chassisApi.position.subscribe(handlePositionChange);
+
     const unsubscribeQuaternion = chassisApi.quaternion.subscribe(
       handleQuaternionChange
     );
+
+    const unsubscribeVelocity =
+      chassisApi.velocity.subscribe(handleVelocityChange);
+    // const unsubscribeAngularVelocity = chassisApi.angularVelocity.subscribe(
+    //   handleAngularVelocityChange
+    // );
 
     intervalPositionID = setInterval(() => {
       const target: any = new Vector3();
@@ -197,6 +223,8 @@ const Tank = (props: any) => {
     return () => {
       unsubscribePosition();
       unsubscribeQuaternion();
+      unsubscribeVelocity();
+      // unsubscribeAngularVelocity();
       clearInterval(intervalPositionID);
       clearInterval(intervalQuanternionID);
     };
