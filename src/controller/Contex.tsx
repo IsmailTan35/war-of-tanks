@@ -15,7 +15,7 @@ export const url: any = () => {
 export const client = io(
   url().replace("http://", "").replace("https://", "").replace("/", ""),
   {
-    transports: ["websocket"],
+    // transports: ["websocket"],
     reconnection: true,
     reconnectionDelay: 2500,
     reconnectionAttempts: 10,
