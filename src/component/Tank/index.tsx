@@ -43,7 +43,7 @@ const Tank = (props: any) => {
       userData: {
         healtyPoint: 500,
       },
-      onCollideEnd: (e: any) => {
+      onCollide: (e: any) => {
         if (spectatorMode) return;
         if (!e.body?.name || !e.target?.name) return;
         if (

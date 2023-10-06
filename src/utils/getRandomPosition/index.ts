@@ -37,16 +37,27 @@ function customRandom(number: number) {
   return x - Math.floor(x);
 }
 
+interface IGetSeedRandomPosition {
+  show: boolean;
+  isDestroy?: boolean;
+  position: [number, number, number];
+}
+
 const getSeedRandomPosition = (
   seed: number,
   min: number = -240,
   max: number = 240,
   height: number = 4
-): [number, number, number] => {
+): IGetSeedRandomPosition => {
   const x = customRandom(seed + 1) * (max - min) + min;
   const y = height;
   const z = customRandom(seed + 2) * (max - min) + min;
-  return [x, y, z];
+
+  return {
+    show: true,
+    isDestroy: false,
+    position: [x, y, z],
+  };
 };
 
 export {

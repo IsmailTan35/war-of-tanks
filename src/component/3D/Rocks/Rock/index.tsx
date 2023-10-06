@@ -14,7 +14,7 @@ const disabledCollide = [
   "cannon",
 ];
 function Rock(props: any) {
-  const { position, setSeed } = props;
+  const { position, setSeed, show } = props;
   const dispath = useAppDispatch();
   const { scene } = useThree();
   const args: any = [11.5, 5, 5];
@@ -29,8 +29,15 @@ function Rock(props: any) {
         return;
       setIsCollided(prv => {
         if (prv) return prv;
-        scene.remove(stoneRef.current);
-        stoneApi.collisionResponse.set(false);
+        setTimeout(() => {
+          scene.remove(stoneRef.current);
+          stoneApi.collisionResponse.set(false);
+          props.setRocksArr((prev: any) => {
+            const newArr = [...prev];
+            newArr[props.idx].isDestroy = true;
+            return newArr;
+          });
+        }, 500);
         return prv;
       });
     },
@@ -61,21 +68,25 @@ function Rock(props: any) {
         receiveShadow
         name="rock"
       >
-        <mesh position={[3, 0, 0]} castShadow>
-          <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-            <meshStandardMaterial color={0x9999999} />
-          </Sphere>
-        </mesh>
-        <mesh castShadow>
-          <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-            <meshStandardMaterial color={0x9999999} />
-          </Sphere>
-        </mesh>
-        <mesh position={[-3, 0, 0]} castShadow>
-          <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-            <meshStandardMaterial color={0x9999999} />
-          </Sphere>
-        </mesh>
+        {show && (
+          <>
+            <mesh position={[3, 0, 0]} castShadow>
+              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
+                <meshStandardMaterial color={0x9999999} />
+              </Sphere>
+            </mesh>
+            <mesh castShadow>
+              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
+                <meshStandardMaterial color={0x9999999} />
+              </Sphere>
+            </mesh>
+            <mesh position={[-3, 0, 0]} castShadow>
+              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
+                <meshStandardMaterial color={0x9999999} />
+              </Sphere>
+            </mesh>
+          </>
+        )}
       </mesh>
       <color attach="background" args={["lightblue"]} />
     </>

@@ -92,10 +92,10 @@ const MyScene = () => {
         }}
         iterations={10}
       >
-        <CustomHud />
+        <Ground />
         <ambientLight intensity={0.3} />
         <directionalLight intensity={0.8} position={[5, 10, 5]} castShadow />
-        <Ground />
+        <CustomHud />
         <Tank position={position} />
         {user.map((item: any, idx: number) => {
           return <RemoteTank key={idx} item={item} idx={idx} />;

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, use, useEffect, useMemo } from "react";
 import { useSphere } from "@react-three/cannon";
 import { useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
@@ -14,7 +14,13 @@ const disabledCollide = [
   "bulletBlowUp",
 ];
 const Bullet = (props: any) => {
-  const { id, args = [0.3], position = [0, -4, -0.5], setIsDestroyed } = props;
+  const {
+    id,
+    args = [0.3],
+    position = [0, -4, -0.5],
+    setIsDestroyed,
+    isDestroyed,
+  } = props;
   const { scene }: any = useThree();
 
   const [bulletRef, api]: any = useSphere(() => ({
@@ -26,6 +32,7 @@ const Bullet = (props: any) => {
       damage: 10,
     },
     onCollideBegin: (e: any) => {
+      if (isDestroyed) return;
       if (!bulletRef.current || !e.body?.name || !e.target?.name) return;
       if (
         e.body.name === "tank-hitbox-player" &&
@@ -44,17 +51,16 @@ const Bullet = (props: any) => {
         e.target.name.includes("bullet-")
       )
         return;
-      scene.remove(bulletRef.current);
-      const position = new Vector3();
-      e.target.getWorldPosition(position);
-      setIsDestroyed(position);
+      setIsDestroyed({
+        x: 0,
+        y: 0,
+        z: 0,
+      });
     },
   }));
 
   useEffect(() => {
-    let timeoutId: any;
     if (!bulletRef.current) return;
-
     const turret = scene.getObjectByName("secondary-gun-barrel-" + id);
     const vectorialBarrelTarget = scene.getObjectByName(
       "secondary-gun-vectorial-barrel-" + id
@@ -76,18 +82,7 @@ const Bullet = (props: any) => {
     ];
     const bodyPosition2 = [0, 0, 0];
     api.applyLocalImpulse(impulse, bodyPosition2);
-
-    timeoutId = setTimeout(() => {
-      if (!bulletRef.current) return;
-      scene.remove(bulletRef.current);
-      const position = new Vector3();
-      bulletRef.current.getWorldPosition(position);
-      setIsDestroyed(position);
-    }, 750);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [api, bulletRef, id, scene]);
+  }, [bulletRef]);
 
   useEffect(() => {
     if (!bulletRef.current) return;
@@ -109,20 +104,25 @@ const Bullet = (props: any) => {
 };
 
 const CustomBullet = (props: any) => {
-  const [isDestroyed, setIsDestroyed] = React.useState(null);
+  const [isDestroyed, setIsDestroyed] = React.useState<any>(null);
 
+  useEffect(() => {
+    let timeoutID = setTimeout(() => {
+      setIsDestroyed({
+        x: 0,
+        y: 0,
+        z: 0,
+      });
+    }, 500);
+    return () => {
+      clearTimeout(timeoutID);
+    };
+  }, []);
   return (
     <>
       {!isDestroyed ? (
-        <Bullet {...{ ...props, setIsDestroyed }} />
-      ) : (
-        <BulletBlowUp
-          {...{
-            ...props,
-            position: isDestroyed,
-          }}
-        />
-      )}
+        <Bullet {...{ ...props, setIsDestroyed, isDestroyed }} />
+      ) : null}
     </>
   );
 };
