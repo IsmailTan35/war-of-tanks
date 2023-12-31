@@ -94,7 +94,7 @@ const Bullet = (props: any) => {
 
   return (
     <>
-      <mesh ref={bulletRef} name={"bullet-" + id}>
+      <mesh ref={bulletRef} name={"bullet-" + id} castShadow receiveShadow>
         <DistanceAudio {...{ audioUrl: "audio/machine-gun.mp3", time: 1000 }} />
         <sphereGeometry args={args} />
         <meshBasicMaterial color={"black"} />

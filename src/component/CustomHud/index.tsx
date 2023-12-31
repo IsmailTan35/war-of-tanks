@@ -9,6 +9,8 @@ import {
 import { useAppSelector } from "@/store";
 
 const CustomHud = () => {
+  const counterRef = useRef<any>(null);
+  const mapRef = useRef<any>(null);
   const [myPosition, setMyPosition] = useState<any>([0, 0, 0]);
   const { health } = useAppSelector(state => state.health);
   const machineGunAmmo = useAppSelector(state => state.ammo.machineGunAmmo);
@@ -20,7 +22,6 @@ const CustomHud = () => {
     state => state.tanksPosition.remotePlayers
   );
   const cameraOrtho = useRef<any>();
-  const [zoom, setZoom] = useState(75);
   useEffect(() => {
     const divede = 200;
     if (position) {
@@ -33,76 +34,94 @@ const CustomHud = () => {
   }, [position]);
 
   useEffect(() => {
+    if (!counterRef.current || !mapRef.current) return;
+
     function resize() {
       const width = window.innerWidth / 2;
       const height = window.innerHeight / 2;
-      setZoom((width / height) * 50);
+
+      cameraOrtho.current.left = -width;
+      cameraOrtho.current.right = width;
+      cameraOrtho.current.top = height;
+      cameraOrtho.current.bottom = -height;
+      cameraOrtho.current.updateProjectionMatrix();
+
+      mapRef.current.position.set(width, height, 1);
+      counterRef.current.position.set(-width, -height, 1);
     }
+    counterRef.current.center.set(-1.55, -0.55);
+    counterRef.current.scale.set(90, 75, 1);
+
+    mapRef.current.center.set(150, 150);
+    mapRef.current.scale.set(1, 1, 1);
+
+    cameraOrtho.current.position.z = 10;
+    resize();
     window.addEventListener("resize", resize);
-  }, []);
+    return () => window.removeEventListener("resize", resize);
+  }, [counterRef]);
   return (
     <>
       <Hud>
-        <OrthographicCamera
-          makeDefault
-          position={[0, 0, 2]}
-          zoom={zoom}
-          ref={cameraOrtho}
-        />
+        <OrthographicCamera makeDefault ref={cameraOrtho} />
         <Environment preset="forest" />
-        <mesh position={[-5, -4.5, 0]}>
+        <sprite ref={counterRef}>
           <boxGeometry args={[3.1, 1.1, 0.2]} />
-          <meshBasicMaterial color="black" />
-          <mesh position={[-1, 0, 0]}>
-            <boxGeometry args={[1, 1, 0.2]} />
-            <meshBasicMaterial color="red" />
-            <Edges color={"black"} />
-            <Text
-              fontSize={0.5}
-              letterSpacing={-0.1}
-              color="white"
-              anchorX="center"
-              anchorY="middle"
-              position={[0, 0, 0.2]}
-            >
-              {cannonAmmo}
-            </Text>
-          </mesh>
-          <mesh>
-            <boxGeometry args={[1, 1, 0.2]} />
-            <meshBasicMaterial color="red" />
-            <Edges color={"black"} />
-            <Text
-              fontSize={0.4}
-              letterSpacing={-0.1}
-              color="white"
-              anchorX="center"
-              anchorY="middle"
-              position={[0, 0, 0.2]}
-            >
-              50/{machineGunAmmo}
-            </Text>
-          </mesh>
-          <mesh position={[1, 0, 0]}>
-            <boxGeometry args={[1, 1, 0.2]} />
-            <meshBasicMaterial color="red" />
-            <Edges color={"black"} />
-            <Text
-              fontSize={0.4}
-              letterSpacing={-0.1}
-              color="white"
-              anchorX="center"
-              anchorY="middle"
-              position={[0, 0, 0.2]}
-            >
-              {health}
-            </Text>
-          </mesh>
-        </mesh>
-        <mesh position={[5.5, 3, 0]}>
-          <boxGeometry args={[2.5, 2.5, 0.1]} />
-          <meshBasicMaterial color="green" />
-          <Edges color={"black"} />
+          <spriteMaterial color="black" />
+          <sprite position={[2.05, 1.05, 0]}>
+            <boxGeometry args={[3.1, 1.1, 0.2]} />
+            <spriteMaterial color="black" />
+            <mesh position={[-1, 0, 0]}>
+              <boxGeometry args={[1, 1, 0.2]} />
+              <meshBasicMaterial color="red" />
+              <Edges color={"black"} />
+              <Text
+                fontSize={0.5}
+                letterSpacing={-0.1}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                position={[0, 0, 0.2]}
+              >
+                {cannonAmmo}
+              </Text>
+            </mesh>
+            <mesh>
+              <boxGeometry args={[1, 1, 0.2]} />
+              <meshBasicMaterial color="red" />
+              <Edges color={"black"} />
+              <Text
+                fontSize={0.4}
+                letterSpacing={-0.1}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                position={[0, 0, 0.2]}
+              >
+                50/{machineGunAmmo}
+              </Text>
+            </mesh>
+            <mesh position={[1, 0, 0]}>
+              <boxGeometry args={[1, 1, 0.2]} />
+              <meshBasicMaterial color="red" />
+              <Edges color={"black"} />
+              <Text
+                fontSize={0.4}
+                letterSpacing={-0.1}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                position={[0, 0, 0.2]}
+              >
+                {health}
+              </Text>
+            </mesh>
+          </sprite>
+        </sprite>
+
+        <sprite position={[5.5, 3, 0]} ref={mapRef}>
+          <boxGeometry args={[250, 250, 0.1]} />
+          <spriteMaterial color="green" />
           {myPosition && (
             <mesh
               position={[myPosition[0], myPosition[2], 1]}
@@ -132,7 +151,7 @@ const CustomHud = () => {
           {rocks.length === 100 && (
             <FixedObje {...{ objects: rocks, color: "gray" }} />
           )}
-        </mesh>
+        </sprite>
       </Hud>
     </>
   );

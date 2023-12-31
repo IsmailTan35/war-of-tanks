@@ -238,7 +238,6 @@ const Tank = (props: any) => {
       socket.off("set-name");
     };
   }, [socket]);
-
   return (
     <>
       <group ref={vehicle} name={"tank-" + id}>

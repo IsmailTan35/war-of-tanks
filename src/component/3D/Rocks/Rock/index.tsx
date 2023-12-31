@@ -61,33 +61,24 @@ function Rock(props: any) {
 
   return (
     <>
-      <mesh
-        position={position}
-        ref={stoneRef}
-        castShadow
-        receiveShadow
-        name="rock"
-      >
+      <group position={position} ref={stoneRef} name="rock">
         {show && (
           <>
             <mesh position={[3, 0, 0]} castShadow>
-              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-                <meshStandardMaterial color={0x9999999} />
-              </Sphere>
+              <sphereGeometry args={[3, 15, 15, 15, 15, 0, 15]} />
+              <meshStandardMaterial color={0x9999999} />
             </mesh>
             <mesh castShadow>
-              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-                <meshStandardMaterial color={0x9999999} />
-              </Sphere>
+              <sphereGeometry args={[3, 15, 15, 15, 15, 0, 15]} />
+              <meshStandardMaterial color={0x9999999} />
             </mesh>
             <mesh position={[-3, 0, 0]} castShadow>
-              <Sphere args={[3, 15, 15, 15, 15, 0, 15]}>
-                <meshStandardMaterial color={0x9999999} />
-              </Sphere>
+              <sphereGeometry args={[3, 15, 15, 15, 15, 0, 15]} />
+              <meshStandardMaterial color={0x9999999} />
             </mesh>
           </>
         )}
-      </mesh>
+      </group>
       <color attach="background" args={["lightblue"]} />
     </>
   );

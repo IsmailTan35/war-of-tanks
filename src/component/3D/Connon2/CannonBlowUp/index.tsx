@@ -74,7 +74,12 @@ const CannonBlowUp = (props: any) => {
     };
   }, []);
   return (
-    <mesh ref={cannonBlowUpRef} name={"cannonBlowUp-" + id}>
+    <mesh
+      ref={cannonBlowUpRef}
+      name={"cannonBlowUp-" + id}
+      castShadow
+      receiveShadow
+    >
       <DistanceAudio {...{ audioUrl: "audio/explosion.mp3" }} />
       <sphereGeometry />
       <meshStandardMaterial color="red" />

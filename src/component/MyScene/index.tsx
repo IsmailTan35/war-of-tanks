@@ -4,14 +4,17 @@ import Rocks from "@/component/3D/Rocks";
 import Tank from "@/component/Tank";
 import Trees from "@/component/3D/Trees";
 import { Physics } from "@react-three/cannon";
-import RemoteTank from "@/component/RemoteTank";
+// import RemoteTank from "@/component/RemoteTank";
 import { SocketContext } from "@/controller/Contex";
 import { getRandomPosition } from "@/utils/getRandomPosition";
 import BombardmentArea from "../3D/BombardmentArea";
 import CustomHud from "../CustomHud";
 import { cameraActions, tanksPositionActions, useAppDispatch } from "@/store";
-
+import AiTank from "../AiTank";
+import { SpotLight } from "@react-three/drei";
+import { Object3D } from "three";
 const MyScene = () => {
+  const [target] = useState(new Object3D());
   const dispatch = useAppDispatch();
   const socket: any = useContext(SocketContext);
 
@@ -93,13 +96,13 @@ const MyScene = () => {
         iterations={10}
       >
         <Ground />
-        <ambientLight intensity={0.3} />
-        <directionalLight intensity={0.8} position={[5, 10, 5]} castShadow />
+
         <CustomHud />
+        <AiTank idx={5} item={{ id: 5, position: [0, 2, 0], name: "ai" }} />
         <Tank position={position} />
-        {user.map((item: any, idx: number) => {
+        {/* {user.map((item: any, idx: number) => {
           return <RemoteTank key={idx} item={item} idx={idx} />;
-        })}
+        })} */}
         {seed ? (
           <>
             <Rocks {...{ setSeed, seed }} />

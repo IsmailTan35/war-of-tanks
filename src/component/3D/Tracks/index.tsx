@@ -18,23 +18,26 @@ const Tracks = (props: any) => {
   return (
     <>
       {show && (
-        <mesh position={[direction == "left" ? 1.7 : -1.7, -1.35, 0]} ref={ref}>
-          <mesh position={[-2, 0, 0]}>
+        <group
+          position={[direction == "left" ? 1.7 : -1.7, -1.35, 0]}
+          ref={ref}
+        >
+          <mesh position={[-2, 0, 0]} castShadow receiveShadow>
             <sphereGeometry args={radius} />
             <meshStandardMaterial color={0x3e3f44} />
             <Edges color={"black"} />
           </mesh>
-          <mesh position={[0, 0, 0]}>
+          <mesh position={[0, 0, 0]} castShadow receiveShadow>
             <sphereGeometry args={radius} />
             <meshStandardMaterial color={0x3e3f44} />
             <Edges color={"black"} />
           </mesh>
-          <mesh position={[2, 0, 0]}>
+          <mesh position={[2, 0, 0]} castShadow receiveShadow>
             <sphereGeometry args={radius} />
             <meshStandardMaterial color={0x3e3f44} />
             <Edges color={"black"} />
           </mesh>
-        </mesh>
+        </group>
       )}
     </>
   );

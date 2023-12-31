@@ -100,7 +100,7 @@ const Connon = (props: any) => {
 
   return (
     <>
-      <mesh ref={cannonRef} name={"cannon-" + id}>
+      <mesh ref={cannonRef} name={"cannon-" + id} castShadow receiveShadow>
         <DistanceAudio {...{ audioUrl: "audio/cannon-fire.mp3" }} />
         <sphereGeometry args={args} />
         <meshBasicMaterial color={"black"} />

@@ -10,21 +10,19 @@ const Hitbox = forwardRef((props: IHitbox, ref: any) => {
   const { name } = props;
 
   return (
-    <>
-      <mesh name={"tank-hitbox-" + name} ref={ref}>
-        {false && (
-          <>
-            <boxGeometry args={hitArgs} />
-            <meshStandardMaterial
-              color={0x000000}
-              transparent={true}
-              opacity={0.2}
-            />
-          </>
-        )}
-        {props.children}
-      </mesh>
-    </>
+    <mesh name={"tank-hitbox-" + name} ref={ref}>
+      {false && (
+        <>
+          <boxGeometry args={hitArgs} />
+          <meshStandardMaterial
+            color={0x000000}
+            transparent={true}
+            opacity={0.2}
+          />
+        </>
+      )}
+      {props.children}
+    </mesh>
   );
 });
 

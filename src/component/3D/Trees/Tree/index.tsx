@@ -42,30 +42,25 @@ const Tree = (props: any) => {
       })
     );
   }, [position]);
+
   return (
     <>
-      <mesh
-        ref={treeRef}
-        name="tree"
-        onPointerEnter={() => {
-          console.log(23112);
-        }}
-      >
+      <mesh ref={treeRef} name="tree" castShadow>
         {show && (
-          <group position={[0, 0, 0]}>
-            <mesh position={[0, 3.5, 0]}>
+          <group position={[0, 0, 0]} castShadow>
+            <mesh position={[0, 3.5, 0]} castShadow>
               <coneGeometry args={[0.5, 1, 16]} />
               <meshStandardMaterial color="green" />
             </mesh>
-            <mesh position={[0, 2.5, 0]}>
+            <mesh position={[0, 2.5, 0]} castShadow>
               <coneGeometry args={[1, 1.5, 16]} />
               <meshStandardMaterial color="green" />
             </mesh>
-            <mesh position={[0, 1.5, 0]}>
+            <mesh position={[0, 1.5, 0]} castShadow>
               <coneGeometry args={[1.25, 2, 16]} />
               <meshStandardMaterial color="green" />
             </mesh>
-            <mesh position={[0, 0, 0]}>
+            <mesh position={[0, 0, 0]} castShadow>
               <cylinderGeometry args={[0.25, 0.25, 4, 16]} />
               <meshStandardMaterial color="brown" />
             </mesh>

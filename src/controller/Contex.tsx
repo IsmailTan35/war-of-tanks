@@ -7,7 +7,6 @@ export const url: any = () => {
   const hostname: any = window.location.hostname;
   const parsed: any = window.location.hostname.split(".");
   const protocol: any = window.location.protocol;
-  console.log("socket url: ", process.env.NEXT_APP_URL_PRODUCTION);
   return parsed.includes("ismailtan")
     ? process.env.NEXT_APP_URL_PRODUCTION
     : `${protocol}//${hostname}:11000`;

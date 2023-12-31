@@ -106,8 +106,8 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
       vehicleApi.setSteeringValue(0.35, 5);
       vehicleApi.setSteeringValue(0.35, 4);
       //middle  wheels
-      vehicleApi.setSteeringValue(-0.1, 3);
-      vehicleApi.setSteeringValue(-0.1, 2);
+      vehicleApi.setSteeringValue(0.35, 3);
+      vehicleApi.setSteeringValue(0.35, 2);
       //rear wheels
       vehicleApi.setSteeringValue(-0.1, 1);
       vehicleApi.setSteeringValue(-0.1, 0);
@@ -116,8 +116,8 @@ export const useRemoteControls = (vehicleApi, chassisApi) => {
       vehicleApi.setSteeringValue(-0.35, 5);
       vehicleApi.setSteeringValue(-0.35, 4);
       //middle  wheels
-      vehicleApi.setSteeringValue(0.1, 3);
-      vehicleApi.setSteeringValue(0.1, 2);
+      vehicleApi.setSteeringValue(-0.35, 3);
+      vehicleApi.setSteeringValue(-0.35, 2);
       //rear wheels
       vehicleApi.setSteeringValue(0.1, 1);
       vehicleApi.setSteeringValue(0.1, 0);

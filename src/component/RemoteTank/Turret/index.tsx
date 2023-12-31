@@ -41,22 +41,16 @@ const Turret = (props: any) => {
         name={"turret" + id}
         rotation={[0, Math.PI / 2, 0]}
       >
-        <mesh position={[0, 0, 0]}>
-          <Cylinder args={[1, 1.3, 0.9, 60]}>
-            <Edges color={0x3e3f44} />
-            <meshStandardMaterial color="darkgreen" />
-          </Cylinder>
-          <mesh position={[0, 0.5, -0.45]}>
-            <Cylinder args={[0.3, 0.3, 0.1, 60]}>
-              <Edges color="black" />
-              <meshStandardMaterial color={0x3e3f44} />
-            </Cylinder>
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[1, 1.3, 0.9, 60]} />
+          <meshStandardMaterial color="darkgreen" />
+          <mesh position={[0, 0.5, -0.45]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.3, 0.3, 0.1, 60]} />
+            <meshStandardMaterial color={0x3e3f44} />
           </mesh>
-          <mesh position={[0, 0.45, 0.45]}>
-            <Cylinder args={[0.25, 0.25, 0.1, 60]}>
-              <Edges color="black" />
-              <meshStandardMaterial color={0x3e3f44} />
-            </Cylinder>
+          <mesh position={[0, 0.45, 0.45]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.25, 0.25, 0.1, 60]} />
+            <meshStandardMaterial color={0x3e3f44} />
           </mesh>
         </mesh>
         <MainGun {...{ id, idx }} ref={mainGunRef}>
