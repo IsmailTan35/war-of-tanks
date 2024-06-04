@@ -13,6 +13,7 @@ import { cameraActions, tanksPositionActions, useAppDispatch } from "@/store";
 import AiTank from "../AiTank";
 import { SpotLight } from "@react-three/drei";
 import { Object3D } from "three";
+import RemoteTank from "../RemoteTank";
 const MyScene = () => {
   const [target] = useState(new Object3D());
   const dispatch = useAppDispatch();
@@ -79,7 +80,7 @@ const MyScene = () => {
   useEffect(() => {
     attempt();
   }, []);
-
+  console.log(user);
   return (
     <>
       <Physics
@@ -98,11 +99,11 @@ const MyScene = () => {
         <Ground />
 
         <CustomHud />
-        <AiTank idx={5} item={{ id: 5, position: [0, 2, 0], name: "ai" }} />
+        {/* <AiTank idx={5} item={{ id: 5, position: [0, 2, 0], name: "ai" }} /> */}
         <Tank position={position} />
-        {/* {user.map((item: any, idx: number) => {
+        {user.map((item: any, idx: number) => {
           return <RemoteTank key={idx} item={item} idx={idx} />;
-        })} */}
+        })}
         {seed ? (
           <>
             <Rocks {...{ setSeed, seed }} />
