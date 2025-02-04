@@ -19,6 +19,7 @@ export default function Home() {
     process.env.NODE_ENV === "production" ? true : false
   );
   const [target] = useState(new Object3D());
+  
   return (
     <>
       <Provider store={store}>
