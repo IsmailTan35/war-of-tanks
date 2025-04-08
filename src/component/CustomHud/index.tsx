@@ -1,5 +1,6 @@
 import React, { memo, use, useEffect, useRef, useState } from "react";
 import {
+  Box,
   Edges,
   Environment,
   Hud,
@@ -7,20 +8,19 @@ import {
   Text,
 } from "@react-three/drei";
 import { useAppSelector } from "@/store";
+import { BoxGeometry } from "three";
 
 const CustomHud = () => {
   const counterRef = useRef<any>(null);
   const mapRef = useRef<any>(null);
   const [myPosition, setMyPosition] = useState<any>([0, 0, 0]);
-  const { health } = useAppSelector(state => state.health);
-  const machineGunAmmo = useAppSelector(state => state.ammo.machineGunAmmo);
-  const cannonAmmo = useAppSelector(state => state.ammo.cannonAmmo);
-  const position = useAppSelector(state => state.tanksPosition.player);
-  const trees = useAppSelector(state => state.tanksPosition.trees);
-  const rocks = useAppSelector(state => state.tanksPosition.rocks);
-  const remotePlayers = useAppSelector(
-    state => state.tanksPosition.remotePlayers
-  );
+  const { health } = useAppSelector((state) => state.health);
+  const machineGunAmmo = useAppSelector((state) => state.ammo.machineGunAmmo);
+  const cannonAmmo = useAppSelector((state) => state.ammo.cannonAmmo);
+  const position = useAppSelector((state) => state.tanksPosition.player);
+  const trees = useAppSelector((state) => state.tanksPosition.trees);
+  const rocks = useAppSelector((state) => state.tanksPosition.rocks);
+  const rmPlyr = useAppSelector((state) => state.tanksPosition.remotePlayers);
   const cameraOrtho = useRef<any>();
   useEffect(() => {
     const divede = 200;
@@ -49,17 +49,19 @@ const CustomHud = () => {
       mapRef.current.position.set(width, height, 1);
       counterRef.current.position.set(-width, -height, 1);
     }
+    cameraOrtho.current.position.z = 2;
+
     counterRef.current.center.set(-1.55, -0.55);
     counterRef.current.scale.set(90, 75, 1);
 
     mapRef.current.center.set(150, 150);
     mapRef.current.scale.set(1, 1, 1);
 
-    cameraOrtho.current.position.z = 10;
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, [counterRef]);
+  console.log(myPosition);
   return (
     <>
       <Hud>
@@ -118,40 +120,26 @@ const CustomHud = () => {
             </mesh>
           </sprite>
         </sprite>
-
-        <sprite position={[5.5, 3, 0]} ref={mapRef}>
+        <sprite ref={mapRef}>
           <boxGeometry args={[250, 250, 0.1]} />
-          <spriteMaterial color="green" />
-          {myPosition && (
-            <mesh
-              position={[myPosition[0], myPosition[2], 1]}
-              rotation={[Math.PI / 2, 0, 0]}
-            >
-              <Edges color={"white"} />
-              <cylinderGeometry args={[0.05, 0.05, 1, 30]} />
-              <meshBasicMaterial color={0x0000ff} />
-            </mesh>
-          )}
-          {remotePlayers.map((player: any, idx: any) => {
-            return (
-              <mesh
-                key={idx}
-                position={[player.position[0], player.position[2], 1]}
-                rotation={[Math.PI / 2, 0, 0]}
-              >
-                <Edges color={"white"} />
-                <cylinderGeometry args={[0.05, 0.05, 1, 30]} />
-                <meshBasicMaterial color={0xff0000} />
-              </mesh>
-            );
-          })}
-          {trees.length === 500 && (
-            <FixedObje {...{ objects: trees, color: "darkgreen" }} />
-          )}
-          {rocks.length === 100 && (
-            <FixedObje {...{ objects: rocks, color: "gray" }} />
-          )}
+          <spriteMaterial color="darkgreen" />
         </sprite>
+        {myPosition && (
+          <FixedObje
+            {...{
+              objects: [myPosition],
+              color: "blue",
+              zIndex: 20,
+            }}
+          />
+        )}
+        {rmPlyr.length > 0 && <FixedObje objects={rmPlyr} color="blue" />}
+        {trees.length === 500 && (
+          <FixedObje {...{ objects: trees, color: "green" }} />
+        )}
+        {rocks.length === 100 && (
+          <FixedObje {...{ objects: rocks, color: "white" }} />
+        )}
       </Hud>
     </>
   );
@@ -161,23 +149,53 @@ const FixedObje = memo((props: any) => {
   const { objects, color } = props;
   return (
     <>
-      {objects.map((tree: any, idx: any) => {
-        if (!tree) return null;
+      {objects.map((item: any, idx: any) => {
+        if (!item) return null;
         return (
-          <mesh
+          <FixedObje2
             key={idx}
-            position={[tree[0], tree[2], 0]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <Edges color={"white"} />
-            <cylinderGeometry args={[0.05, 0.05, 1, 30]} />
-            <meshBasicMaterial color={color} />
-          </mesh>
+            position={[item[0], item[2], 1]}
+            color={color}
+          />
         );
       })}
     </>
   );
 });
+const FixedObje2 = (props: any) => {
+  const { position, color, zIndex } = props;
+  const mapRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.center.set(-705, -340);
+    mapRef.current.scale.set(1, 1, 1);
+    function resize() {
+      const width = window.innerWidth / 2;
+      const height = window.innerHeight / 2;
+
+      mapRef.current.position.set(width, height, 1);
+      mapRef.current.scale.set(1, 1, 1);
+
+      mapRef.current.center.set(
+        position[0] + width * 0.18,
+        position[1] + width * 0.18
+      );
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [mapRef, position]);
+
+  return (
+    <>
+      <sprite ref={mapRef} position={[position[0], position[1], zIndex]}>
+        <spriteMaterial color={color} />
+        <circleGeometry args={[5, 30]} />
+      </sprite>
+    </>
+  );
+};
 FixedObje.displayName = "FixedObje";
 
 export default memo(CustomHud);

@@ -6,7 +6,7 @@ interface TanksPositionState {
   rocks: any[];
   trees: any[];
 }
-const divide = 200;
+const divide = 2;
 
 const { reducer, actions } = createSlice({
   name: "user",
@@ -91,14 +91,14 @@ const { reducer, actions } = createSlice({
     ) => {
       const { payload } = action;
       state.remotePlayers = state.remotePlayers.filter(
-        item => item.id !== payload
+        (item) => item.id !== payload
       );
     },
 
-    deleteToken: state => {
+    deleteToken: (state) => {
       state.player = null;
     },
-    deleteUser: state => {
+    deleteUser: (state) => {
       state.player = null;
     },
   },
